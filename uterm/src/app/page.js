@@ -1,24 +1,28 @@
 'use client'
 
-import React, { Component } from 'react'
-import Terminal from 'react-console-emulator'
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation'
 
-const commands = {
-  echo: {
-    description: 'Echo a passed string.',
-    usage: 'echo <string>',
-    fn: (...args) => args.join(' ')
-  }
-}
+export default function HomePage() {
+  const router = useRouter();
 
-export default class MyTerminal extends Component {
-  render () {
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        router.push('/temp');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup the event listener when you leave the page
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [router]);
+
     return (
-      <Terminal
-        commands={commands}
-        welcomeMessage={'Welcome to the React terminal!'}
-        promptLabel={'me@React:~$'}
-      />
-    )
-  }
+    <div className="h-screen bg-black flex flex-col items-center justify-center text-white text-center p-6">
+      <p className="mb-6 text-lg">░▒▓█ A terminal to the observable universe █▓▒░</p>
+      <h1> press [ ENTER ] to continue</h1>
+    </div>
+  );
 }

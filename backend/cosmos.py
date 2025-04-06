@@ -49,7 +49,7 @@ def generatePrompt(arg: str, json:str, wd: str, temperature: int):
 
         Each entry must reflect the scale, properties, and uniqueness of {arg} only. Make sure it adheres to the format, guideed by the examples. Look at the cwd for context on generating the directories, and look at the entire tree of universe to generate more context and generate directories specifically related to the path that have not already been outputted     
 
-        The content you generate should be strictly factual. Very rarely, you can generate hidden (dot) files including secret lore, you can be somewhat creative with this.          
+        The content you generate should be strictly factual. Very rarely, you can generate hidden (dot) files including secret lore, you can be somewhat creative with this. However, everything should be very specific, narrow scoped, and defined. Do not generalize anything.        
         ensure you adhere to the strict output format
         """
     elif temperature == 0.5:
@@ -89,9 +89,9 @@ def generatePrompt(arg: str, json:str, wd: str, temperature: int):
 
         Each entry must reflect the scale, properties, and uniqueness of {arg} only. Make sure it adheres to the format, guideed by the examples. Look at the cwd for context on generating the directories, and look at the entire tree of universe to generate more context and generate directories specifically related to the path that have not already been outputted     
 
-        The content you generate should be mostly factual, but allow for some creativity and leeway. For example, sometimes generate things like space exploration logs, or evidence of lost civilizations, or advancements in society, etc (you can come up with other stuff). Be creative but be grounded, this is still our universe. You can also rarely generate some hidden (dot) files including lore, conspiracies, top secret data, basically things that could technically exist
+        The content you generate should be mostly factual, but allow for some creativity and leeway. For example, sometimes generate things like space exploration logs, or evidence of lost civilizations, or advancements in society, etc (you can come up with other stuff). Be creative but be grounded, this is still our universe. You can also rarely generate some hidden (dot) files including lore, conspiracies, top secret data, basically things that could technically exist. However, everything should be very specific, narrow scoped, and defined. Do not generalize anything
         
-        ensure you adhere to the strict output format
+        ensure you adhere to the strict output format. 
         """
     elif temperature == 0.9:
         output = f"""
@@ -127,7 +127,7 @@ def generatePrompt(arg: str, json:str, wd: str, temperature: int):
 
         Each entry must reflect the scale, properties, and uniqueness of {arg} only. Make sure it adheres to the format, guideed by the examples. Look at the cwd for context on generating the directories, and look at the entire tree of universe to generate more context and generate directories specifically related to the path that have not already been outputted     
 
-        The content you generate should be chaotic. Think of a parallel uiverse with a different timeline, or different events, or different galaxies/stars/planets. For example, civilization expanding to other planets, or life going extinct, or space wars, or dyson spheres, or new technology
+        The content you generate should be chaotic. Think of a parallel uiverse with a different timeline, or different events, or different galaxies/stars/planets. For example, civilization expanding to other planets, or life going extinct, or space wars, or dyson spheres, or new technology. However, everything should be very specific, narrow scoped, and defined. Do not generalize anything, you have the liberty to generate what you want
 
         ensure you adhere to the strict output format
         

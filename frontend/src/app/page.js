@@ -28,7 +28,7 @@ export default function TerminalScreen() {
     <TerminalWindow>
       <div className="relative w-full h-full overflow-hidden">
     
-        <div className="absolute inset-0 z-40 bg-black animate-line-wipe pointer-events-none rounded-[12px]" />
+        <div className="absolute inset-0 z-40 bg-black animate-line-wipe pointer-events-none" />
 
         <div className="absolute inset-x-0 bottom-0 animate-scroll-up px-6 py-12 text-center flex flex-col items-center justify-center text-bone">
           <UTermLogo />

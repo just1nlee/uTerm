@@ -64,7 +64,7 @@ export default function TempPage() {
   return (
     <TerminalWindow>
       <div className="h-[500px] w-full text-bone flex flex-col justify-start px-8">
-        <h1 className="mt-10 text-center w-full">Select your creativity temperature:</h1>
+        <h1 className="mt-10 text-center w-full">░▒▓█ Select your creativity temperature  █▓▒░</h1>
   
         <div className="flex flex-col gap-2 mt-12 mb-4 pl-16">
           {options.map((opt, i) => (
@@ -88,7 +88,7 @@ export default function TempPage() {
         </div>
         
         <div className="absolute bottom-20 left-0 w-full text-center text-bone">
-          <span className="font-press text-sm">↑ ↓</span> to navigate<br />░▒▓█ press [ ENTER ] to explore █▓▒░</div>
+          <span className="font-press text-sm">↑ ↓</span> to navigate<br />press [ ENTER ] to explore</div>
         </div>
     </TerminalWindow>
   );

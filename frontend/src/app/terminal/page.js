@@ -108,7 +108,7 @@ Type 'exit' to return to the homepage.
           {
             method: 'GET',
             headers: {
-              'Content-Type': 'application/json',
+              'X-API-Key': '18ca0b78f576cf69741d7fac47570aad'
             },
           }
         );
@@ -118,9 +118,9 @@ Type 'exit' to return to the homepage.
           output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
           setHistory((prev) => [...prev, `* ${input}`, output]);
           return;
+        } else{
+          data = await res.json();
         }
-  
-        data = await res.json();
       } catch (err) {
         output = `Client error: ${err.message}`;
         setHistory((prev) => [...prev, `* ${input}`, output]);
@@ -131,12 +131,13 @@ Type 'exit' to return to the homepage.
   
       if (Array.isArray(suggestions)) {
         if (suggestions.length === 1) {
-          setInput(suggestions[0]); // autofill
+          setInput(suggestions[0]);
         } else if (suggestions.length > 1) {
           setHistory((prev) => [`* ${input}`, suggestions.join('  '), ...prev]);
         } else {
           setHistory((prev) => [`* ${input}`, 'No suggestions', ...prev]);
         }
+        setAutoScroll(true);
       }
     }
   }

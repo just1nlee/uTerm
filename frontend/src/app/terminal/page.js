@@ -12,66 +12,89 @@ export default function TerminalPage() {
   const terminalContentRef = useRef(null);
   const [universeID, setUniverseID] = useState(null);
   const [autoScroll, setAutoScroll] = useState(true);
+  const [welcomeTyped, setWelcomeTyped] = useState(false);
+  const [cursorBlink, setCursorBlink] = useState(true);
+  const [cursorPosition, setCursorPosition] = useState(0);
+
+  // Welcome message text
+  const welcomeMessage = `
+░▒▓█ welcome to uTerm, a terminal-based universe explorer
+
+Type 'help' to see available commands.
+Type 'exit' to return to the homepage.
+
+`;
 
   useEffect(() => {
     const storedID = sessionStorage.getItem('universeID');
     if (storedID) {
-      const parsedID = parseInt(storedID, 10);
-      setUniverseID(parsedID);
+      setUniverseID(parseInt(storedID, 10));
     } else {
       console.warn('No universeID found in sessionStorage');
     }
-  }, []);
+    
+    // Type out welcome message only once
+    if (!welcomeTyped) {
+      let currentText = '';
+      const lines = welcomeMessage.split('\n');
+      let currentLine = 0;
+      let currentChar = 0;
+      
+      const typeInterval = setInterval(() => {
+        if (currentLine < lines.length) {
+          if (currentChar < lines[currentLine].length) {
+            currentText += lines[currentLine][currentChar];
+            setHistory([currentText]);
+            currentChar++;
+          } else {
+            currentText += '\n';
+            currentLine++;
+            currentChar = 0;
+          }
+        } else {
+          clearInterval(typeInterval);
+          setWelcomeTyped(true);
+        }
+      }, 30); // Adjust typing speed here
+      
+      return () => clearInterval(typeInterval);
+    }
+  }, [welcomeTyped]);
 
-  // Focus input on mount and when terminal is clicked
+  // Blinking cursor effect
   useEffect(() => {
-    inputRef.current?.focus();
+    const blinkInterval = setInterval(() => {
+      setCursorBlink(prev => !prev);
+    }, 530); // Cursor blink rate
+    
+    return () => clearInterval(blinkInterval);
   }, []);
 
-  const builtInCommands = {
-    echo: {
-      description: 'Echo a passed string.',
-      usage: 'echo <string>',
-      fn: (...args) => args.join(' ')
-    },
-    help: {
-      description: 'List commands.',
-      usage: 'help',
-      fn: () => Object.keys(builtInCommands).join(', '),
-    },
-    clear: {
-      description: 'Clear terminal history.',
-      usage: 'clear',
-      fn: () => {
-        setHistory([]);
-        return '';
-      }
-    },
-    exit: {
-      description: 'Exit the terminal and return to homepage.',
-      usage: 'exit',
-      fn: () => router.push('/'),
-    },
-  };
+  // Update cursor position when input changes
+  useEffect(() => {
+    if (inputRef.current) {
+      setCursorPosition(inputRef.current.selectionStart);
+    }
+  }, [input]);
 
-  // Handle scrolling when history changes
+  // Auto-scroll logic for reversed terminal (scrolls to top)
   useEffect(() => {
     if (terminalContentRef.current && autoScroll) {
-      // For a reversed terminal, we scroll to top
       terminalContentRef.current.scrollTop = 0;
     }
   }, [history]);
 
-  // Detect if user has manually scrolled down
   const handleScroll = () => {
     if (terminalContentRef.current) {
-      // In reversed mode, we're checking if we're at the top
       const isScrolledToTop = terminalContentRef.current.scrollTop < 10;
       setAutoScroll(isScrolledToTop);
     }
   };
 
   async function handleKeyDown(e) {
+    // Always update cursor position on key events
+    setCursorPosition(e.target.selectionStart);
+
     if (e.key === 'Tab') {
       e.preventDefault();
       const trimmedInput = input.trim();
@@ -110,9 +133,9 @@ export default function TerminalPage() {
         if (suggestions.length === 1) {
           setInput(suggestions[0]);
         } else if (suggestions.length > 1) {
-          setHistory((prev) => [suggestions.join('  '), ...prev]);
+          setHistory((prev) => [`* ${input}`, suggestions.join('  '), ...prev]);
         } else {
-          setHistory((prev) => [...prev, `* ${input}`, 'No suggestions']);
+          setHistory((prev) => [`* ${input}`, 'No suggestions', ...prev]);
         }
         setAutoScroll(true);
       }
@@ -127,6 +150,13 @@ export default function TerminalPage() {
     
     const [cmd, ...args] = trimmedInput.split(' ');
 
+    // Special logic for clear command
+    if (cmd === 'clear') {
+      setHistory([]); // Clear everything.
+      setInput('');
+      return;
+    }
+    
     let output = '';
     
     if (builtInCommands[cmd]) {
@@ -145,7 +175,7 @@ export default function TerminalPage() {
       setInput('');
       return;
     }
-
+  
     try {
       const res = await fetch('https://backend-4na6.onrender.com/command/', {
         method: 'POST',
@@ -158,8 +188,8 @@ export default function TerminalPage() {
           command: trimmedInput,
         }),
       });
-
-      if(!res.ok){
+  
+      if (!res.ok) {
         const errorData = await res.json();
         output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
       } else {
@@ -169,16 +199,17 @@ export default function TerminalPage() {
     } catch (err) {
       output = `Client error: ${err.message}`;
     }
-
-    // Reverse the order to build upwards - command first, then output
+  
     setHistory((prev) => [output, `* ${input}`, ...prev]);
     setInput('');
-    
-    // Enable auto-scroll when user sends a command
     setAutoScroll(true);
   }
 
-  // Handle terminal click to focus on input
+  // Focus input on mount and when terminal is clicked
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   const handleTerminalClick = () => {
     inputRef.current?.focus();
   };
@@ -190,13 +221,61 @@ export default function TerminalPage() {
     setAutoScroll(true);
   };
 
+  // Define the fixed order for commands.
+const commandOrder = ['help', 'clear', 'bigbang', 'ls', 'tree', 'cat', 'echo', 'exit'];
+
+// Define a helpInfo object that contains every command's description and usage.
+const helpInfo = {
+  help: { description: 'List commands.', usage: 'help' },
+  clear: { description: 'Clear terminal history.', usage: 'clear' },
+  bigbang: { description: 'Reset the universe.', usage: 'bigbang' },
+  ls: { description: 'List files and directories.', usage: 'ls [options] [path]' },
+  tree: { description: 'Display explored universe.', usage: 'tree'},
+  cat: { description: 'Display file contents.', usage: 'cat <filename>' },
+  echo: { description: 'Echo a passed string.', usage: 'echo <string>' },
+  exit: { description: 'Exit the terminal and return to homepage.', usage: 'exit' },
+};
+
+let builtInCommands = {
+  help: {
+    description: 'List commands.',
+    usage: 'help',
+    fn: () => {
+      // Build help output using our helpInfo object.
+      const descriptions = commandOrder.map(cmd => {
+        const info = helpInfo[cmd];
+        return `${cmd.padEnd(10)} - ${info.description}\n`;
+      });
+      return descriptions;
+    }
+  },
+  clear: {
+    description: 'Clear terminal history.',
+    usage: 'clear',
+    fn: () => {
+      setHistory([]);
+      return '';
+    }
+  },
+  echo: {
+    description: 'Echo a passed string.',
+    usage: 'echo <string>',
+    fn: (...args) => args.join(' ')
+  },
+  exit: {
+    description: 'Exit the terminal and return to homepage.',
+    usage: 'exit',
+    fn: () => router.push('/')
+  },
+}; 
+
   return (
     <TerminalWindow>
       <div 
         className="flex flex-col h-full w-full bg-black text-bone"
         onClick={handleTerminalClick}
       >
-        {/* Terminal content building upwards, takes all available space */}
+        {/* Terminal content (reversed order) */}
         <div 
           ref={terminalContentRef}
           className="flex-1 overflow-y-auto px-8 pb-2 flex flex-col-reverse"
@@ -212,18 +291,38 @@ export default function TerminalPage() {
           ))}
         </div>
         
-        {/* Command input at the very bottom of the page */}
-        <div className="w-full px-8 py-4 bg-black mt-auto">
+        {/* Command input area with custom blinking cursor */}
+        <div className="w-full px-8 py-4 bg-black mt-auto border-t border-gray-800">
           <form onSubmit={handleCommands} className="flex w-full text-xl items-center">
             <span className="mr-2 text-white">*</span>
-            <input
-              ref={inputRef}
-              className="bg-transparent border-none outline-none flex-1 text-xl text-bone"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              autoFocus
-            />
+            {/* Custom Input Rendering */}
+            <div className="flex-1 relative">
+              <div className="flex items-center w-full">
+                <div className="flex-1 relative min-h-[1.5rem]">
+                  <span className="whitespace-pre">{input.substring(0, cursorPosition)}</span>
+                  <span 
+                    className={`h-5 w-2 bg-bone inline-block align-middle ${cursorBlink ? 'opacity-100' : 'opacity-0'}`}
+                  ></span>
+                  <span className="whitespace-pre">{input.substring(cursorPosition)}</span>
+                  <input
+                    ref={inputRef}
+                    className="opacity-0 absolute top-0 left-0 w-full h-full bg-transparent border-none outline-none text-xl"
+                    value={input}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      setCursorPosition(e.target.selectionStart);
+                    }}
+                    onKeyDown={(e) => {
+                      handleKeyDown(e);
+                      setCursorPosition(e.target.selectionStart);
+                    }}
+                    onSelect={(e) => setCursorPosition(e.target.selectionStart)}
+                    onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                    autoFocus
+                  />
+                </div>
+              </div>
+            </div>
           </form>
         </div>
         

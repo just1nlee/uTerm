@@ -80,7 +80,7 @@ export default function TempPage() {
         </div>
         
         <div className="absolute bottom-20 left-0 w-full text-center text-bone">
-          <span className="font-press text-sm">↑ ↓</span> to navigate<br />press [ ENTER ] to explore █▓▒░</div>
+          <span className="font-press text-sm">↑ ↓</span> to navigate<br />press [ ENTER ] to explore</div>
         </div>
     </TerminalWindow>
   );

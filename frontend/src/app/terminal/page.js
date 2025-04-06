@@ -12,6 +12,7 @@ export default function TerminalPage() {
   const terminalContentRef = useRef(null);
   const [universeID, setUniverseID] = useState(null);
   const [autoScroll, setAutoScroll] = useState(true);
+  const [treeOutput, setTreeOutput] = useState(null);
 
   useEffect(() => {
     const storedID = sessionStorage.getItem('universeID');
@@ -70,6 +71,22 @@ export default function TerminalPage() {
       setAutoScroll(isScrolledToTop);
     }
   };
+
+  function PrintTree({ node, prefix = '', isLast = true }) {
+    const lines = [];
+    const hasChildren = node.contents && node.contents.length > 0;
+    const connector = prefix + (prefix ? (isLast ? '└── ' : '├── ') : '');
+    lines.push(connector + node.name);
+
+    if (hasChildren) {
+      const newPrefix = prefix + (isLast ? '    ' : '│   ');
+      node.contents.forEach((child, i) => {
+        const isLastChild = i === node.contents.length - 1;
+        lines.push(...formatTree(child, newPrefix, isLastChild));
+      });
+    }
+    return lines;
+  }
 
   async function handleKeyDown(e) {
     if (e.key === 'Tab') {
@@ -164,7 +181,15 @@ export default function TerminalPage() {
         output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
       } else {
         const data = await res.json();
-        output = data.message || JSON.stringify(data);
+        if (cmd === 'tree') {
+          const treeLines = PrintTree(data.message);
+          setHistory((prev) => [...treeLines.reverse(), `* ${input}`, ...prev]);
+          setInput('');
+          setAutoScroll(true);
+          return;
+        } else {
+          output = data.message || JSON.stringify(data);
+        }
       }
     } catch (err) {
       output = `Client error: ${err.message}`;

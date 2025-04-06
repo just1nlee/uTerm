@@ -247,7 +247,7 @@ Type 'exit' to return to the homepage.
   };
 
   // Define the fixed order for commands.
-const commandOrder = ['help', 'clear', 'bigbang', 'ls', 'tree', 'cat', 'echo', 'exit'];
+const commandOrder = ['help', 'clear', 'bigbang', 'ls', 'tree', 'pwd', 'cd', 'cat', 'echo', 'exit'];
 
 // Define a helpInfo object that contains every command's description and usage.
 const helpInfo = {
@@ -256,6 +256,8 @@ const helpInfo = {
   bigbang: { description: 'Reset the universe.', usage: 'bigbang' },
   ls: { description: 'List files and directories.', usage: 'ls [options] [path]' },
   tree: { description: 'Display explored universe.', usage: 'tree'},
+  pwd: { description: 'Print working directory.', usage: 'pwd' },
+  cd: { description: 'Change directory.', usage: 'cd <directory>' },
   cat: { description: 'Display file contents.', usage: 'cat <filename>' },
   echo: { description: 'Echo a passed string.', usage: 'echo <string>' },
   exit: { description: 'Exit the terminal and return to homepage.', usage: 'exit' },

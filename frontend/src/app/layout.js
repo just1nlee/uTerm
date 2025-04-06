@@ -23,7 +23,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${jetbrains.variable} ${vt323.variable}`}>
       <head>
-        {/* Disable zoom on mobile */}
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"

@@ -12,7 +12,7 @@ module.exports = {
     extend: {
       fontFamily: {
         body: ['var(--font-vt323)', 'monospace'],
-        JetBrains_Mono: ['var(--font-jetbrains)', 'monospace'],
+        press: ['var(--font-pressstart)', 'monospace'],
       },
       colors: {
         bone: '#d0d0d0',

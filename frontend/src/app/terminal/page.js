@@ -37,7 +37,7 @@ export default function TerminalPage() {
       description: 'Exit the terminal and return to homepage.',
       usage: 'exit',
       fn: () => router.push('/'),
-    }
+    },
   };
 
   async function handleKeyDown(e) {
@@ -147,21 +147,21 @@ export default function TerminalPage() {
 
   return (
     <TerminalWindow>
-      <div ref={scrollRef} className="flex flex-col h-[550px] w-full bg-black text-bone font-mono text-base px-8 pt-4 overflow-y-auto">
+      <div ref={scrollRef} className="flex flex-col h-[550px] w-full bg-black text-bone text-xl px-8 pt-4 overflow-y-auto">
         <div className="flex flex-col justify-end flex-grow min-h-0">
           <div className="flex flex-col justify-end flex-grow">
             {history.map((line, i) => (
-              <div key={i} className="w-full text-left text-base text-bone">
+              <div key={i} className="w-full text-left text-xl text-bone">
                 {line}
               </div>
             ))}
           </div>
     
-          <form onSubmit={handleCommands} className="flex w-full items-center mt-2">
+          <form onSubmit={handleCommands} className="flex w-full text-xl items-center mt-2">
             <span className="mr-2 text-white text-base">*</span>
             <input
               ref={inputRef}
-              className="bg-transparent border-none outline-none flex-1 text-bone text-base font-mono"
+              className="bg-transparent border-none outline-none flex-1 text-xl text-bone text-base"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}

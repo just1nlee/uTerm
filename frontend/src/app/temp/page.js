@@ -25,7 +25,9 @@ export default function TempPage() {
       try {
         const res = await fetch('https://backend-4na6.onrender.com/create/', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json',
+                      'X-API-Key': '18ca0b78f576cf69741d7fac47570aad',
+           },
           body: JSON.stringify({ temperature: selected.value }),
         });
   
@@ -57,7 +59,7 @@ export default function TempPage() {
   return (
     <TerminalWindow>
     <div className="h-[500px] bg-black text-bone font-mono text-xs flex flex-col items-center justify-center px-4">
-      <h1 className="text-2xl mb-6">Select your creativity temperature:</h1>
+      <h1 className="text-2xl justify-center mb-6">Select your creativity temperature:</h1>
 
       <div className="flex flex-col gap-2 text-lg font-mono">
         {options.map((opt, i) => (

@@ -85,8 +85,7 @@ def tabRequest(request: Request, universeid: int = Query(...), command:str = Que
     universe = universes.getUniverse(universeid)
     if not universe:
         return {"error": "universe not found"}
-    print(command[4:])
-    results = universe.tab(command[4:])
+    results = universe.tab(command)
     print(results)
     return {"message": results}
 

@@ -31,6 +31,54 @@ export default function TerminalPage() {
     }
   };
 
+  async function handleKeyDown(e) {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const trimmedInput = input.trim();
+  
+      let data;
+      let output;
+  
+      try {
+        const res = await fetch(
+          `https://backend-4na6.onrender.com/tab/?universeid=${universeID}&command=${encodeURIComponent(trimmedInput)}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+  
+        if (!res.ok) {
+          const errorData = await res.json();
+          output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
+          setHistory((prev) => [...prev, `* ${input}`, output]);
+          return;
+        }
+  
+        data = await res.json();
+      } catch (err) {
+        output = `Client error: ${err.message}`;
+        setHistory((prev) => [...prev, `* ${input}`, output]);
+        return;
+      }
+  
+      const suggestions = data.message;
+  
+      if (Array.isArray(suggestions)) {
+        if (suggestions.length === 1) {
+          setInput(suggestions[0]); // autofill
+        } else if (suggestions.length > 1) {
+          setHistory((prev) => [...prev, `* ${input}`, suggestions.join('  ')]);
+        } else {
+          setHistory((prev) => [...prev, `* ${input}`, 'No suggestions']);
+        }
+      }
+    }
+  }
+  
+
   async function handleCommands(e) {
     e.preventDefault();
     const trimmedInput = input.trim();
@@ -108,6 +156,7 @@ export default function TerminalPage() {
               className="bg-transparent border-none outline-none flex-1 text-bone text-base font-mono"
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
               autoFocus
             />
           </form>

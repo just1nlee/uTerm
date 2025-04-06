@@ -3,11 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TerminalWindow from './components/TerminalWindow';
-import blackHole from './components/BlackHole';
-import screenText from './components/TypingText';
-import title from './components/UTermTitle';
-
-
+import UTermLogo from './components/uTermLogo';
 
 export default function TerminalScreen() {
   const router = useRouter();
@@ -36,20 +32,23 @@ export default function TerminalScreen() {
   }, [router]);
 
   return (
-    <TerminalWindow>
-    <div className="bg-black text-bone font-mono flex justify-center">
-      <div className="w-[60ch] whitespace-pre leading-tight">
-        {allLines.slice(0, linesShown).map((line, i) => {
-          if (i < blackHole.length) {
-            return <div key={i} className="text-xs text-left">{line}</div>;
-          } else if (i < blackHole.length + title.length) {
-            return <div key={i} className="text-lg font-bold text-center">{line}</div>;
-          } else {
-            return <div key={i} className="text-base text-center">{line}</div>;
-          }
-        })}
-      </div>
+    <>
+    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+      <div className="w-[336px] h-[372px] bg-black animate-line-wipe" />
     </div>
-  </TerminalWindow>
-  );
+
+    <TerminalWindow>
+      <div className="relative w-full h-full overflow-hidden">
+    
+        <div className="absolute inset-0 z-40 bg-black animate-line-wipe pointer-events-none rounded-[12px]" />
+
+        <div className="absolute inset-x-0 bottom-0 animate-scroll-up px-6 py-12 text-center flex flex-col items-center justify-center text-bone">
+          <UTermLogo />
+          <p className="mt-6 text-[1.83rem] leading-snug">░▒▓█ A terminal to the observable universe █▓▒░</p>
+          <p className="text-[1.83rem] leading-snug">press [ ENTER ] to continue</p>
+        </div>
+      </div>
+    </TerminalWindow>
+  </>
+); 
 }

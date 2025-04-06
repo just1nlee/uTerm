@@ -3,62 +3,29 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import TerminalWindow from './components/TerminalWindow';
+import blackHole from './components/black_hole';
+import screenText from './components/TypingText';
 
 export default function TerminalScreen() {
   const router = useRouter()
 
-  const black_hole = [
-    '                        +++++++++++++++++',
-    '                   ++++++++++++++++++++++++++++',
-    '               ++++++++++++++++++++++++     +++++++',
-    '            ++++++++++++++++++++++++++++++++    ++++++',
-    '          ++++++++++++++++++++++++++++++++++++++   ++++++',
-    '        ++++++++++++++                  +++++++++++    +++',
-    '       +++++++++++                    +      +++++++++   +++',
-    '      ++++++++++                         +    +++++++++   +++',
-    '     ++++++++++                            +     ++++++++   +++',
-    '     +++++++++                              ++    ++++++++   ++',
-    '     +++++++++                              +++   ++++++++  +++',
-    '     +++++++++                              +++   +++++++++  ++',
-    '     ++++++++++                          ++++++   +++++++++  ++',
-    '  +   ++++++++++++                     ++++++++   +++++++++  ++',
-    '  +    ++++++++++++++             +++++++++++    +++++++++   +',
-    '  ++    +++++++++++++++++++++++++++++++++++     +++++++++   +',
-    '   ++     ++++++++++++++++++++++++++++++     +++++++++++  +',
-    '     ++      +++++++++++++++++++++++++     +++++++++++',
-    '      ++++        +++++++++++++++       ++++++++++++',
-    '        +++++                       ++++++++++++++',
-    '          +++++++++++++++++++++++++++++++++++++',
-    '             +++++++++++++++++++++++++++++',
-    '                 ++++++++++++++++++++',
-    '',
-    '',
-    '',
-    '',
-  ]
-
-  const screen_text = [
-    '░▒▓█ A terminal to the observable universe █▓▒░',
-    'press [ ENTER ] to continue'
-  ]
-
-  const [phase, setPhase] = useState('black_hole')
+  const [phase, setPhase] = useState('blackHole')
   const [linesShown, setLinesShown] = useState(0)
 
   useEffect(() => {
-    if (phase === 'black_hole' && linesShown < black_hole.length) {
+    if (phase === 'blackHole' && linesShown < blackHole.length) {
       const timeout = setTimeout(() => { setLinesShown((prev) => prev + 1)}, 30)
       return () => clearTimeout(timeout)
     }
 
-    if(phase === 'black_hole' && linesShown >= black_hole.length){
+    if(phase === 'blackHole' && linesShown >= blackHole.length){
       setTimeout(() => { 
-        setPhase('screen_text')
+        setPhase('screenText')
         setLinesShown(0)
       }, 60)
     }
 
-    if(phase === 'screen_text' && linesShown < screen_text.length){
+    if(phase === 'screenText' && linesShown < screenText.length){
       const t = setTimeout(() => setLinesShown((n) => n + 1), 30)
       return () => clearTimeout(t)
     }
@@ -66,7 +33,7 @@ export default function TerminalScreen() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Enter' && linesShown >= screenContent.length) {
+      if (e.key === 'Enter' && linesShown >= screenText.length) {
         router.push('/temp')
       }
     }
@@ -76,17 +43,19 @@ export default function TerminalScreen() {
   }, [router, linesShown])
 
   return (
+    <TerminalWindow>
     <div className="h-screen bg-black text-white-400 font-mono text-s leading-normal whitespace-pre items-center overflow-y-auto px-6 py-8 flex flex-col gap-6">
       <div className="w-[60ch] mx-auto">
       <pre className="text-left">
-        {black_hole.slice(0, phase === 'black_hole' ? linesShown : black_hole.length).join('\n')}
+        {blackHole.slice(0, phase === 'blackHole' ? linesShown : blackHole.length).join('\n')}
       </pre>
-      {phase === 'screen_text' && (
+      {phase === 'screenText' && (
         <pre className="text-center mx-auto">
-          {screen_text.slice(0, linesShown).join('\n')}
+          {screenText.slice(0, linesShown).join('\n')}
         </pre>
       )}
       </div>
     </div>
+    </TerminalWindow>
   )
 }

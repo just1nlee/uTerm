@@ -1,7 +1,5 @@
 'use client';
 
-const universeID = 100;
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import TerminalWindow from '../components/TerminalWindow';
@@ -12,6 +10,17 @@ export default function TerminalPage() {
   const [input, setInput] = useState('');
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
+  const [universeID, setUniverseID] = useState(null);
+
+  useEffect(() => {
+    const storedID = sessionStorage.getItem('universeID');
+    if (storedID) {
+      const parsedID = parseInt(storedID, 10);
+      setUniverseID(parsedID);
+    } else {
+      console.warn('No universeID found in sessionStorage');
+    }
+  }, []);
 
   const builtInCommands = {
     echo: {
@@ -53,7 +62,9 @@ export default function TerminalPage() {
     try {
       const res = await fetch('https://backend-4na6.onrender.com/command/', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json',
+                  'X-API-Key': '18ca0b78f576cf69741d7fac47570aad',
+        },
         body: JSON.stringify({
           universeid: universeID,
           command: trimmedInput,
@@ -88,11 +99,8 @@ export default function TerminalPage() {
 
   return (
     <TerminalWindow>
-      <div
-        ref={scrollRef}
-        className="flex flex-col h-[550px] w-full bg-black text-bone font-mono text-base overflow-y-auto px-8 pt-4"
-      >
-        <div className="w-1/2 flex flex-col justify-end flex-grow min-h-full">
+      <div ref={scrollRef} className="flex flex-col h-[550px] w-full bg-black text-bone font-mono text-base px-8 pt-4 overflow-y-auto">
+        <div className="flex flex-col justify-end flex-grow min-h-0">
           <div className="flex flex-col justify-end flex-grow">
             {history.map((line, i) => (
               <div key={i} className="w-full text-left text-base text-bone">
@@ -100,7 +108,7 @@ export default function TerminalPage() {
               </div>
             ))}
           </div>
-
+    
           <form onSubmit={handleCommands} className="flex w-full items-center mt-2">
             <span className="mr-2 text-white text-base">*</span>
             <input

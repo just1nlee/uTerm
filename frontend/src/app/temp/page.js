@@ -32,9 +32,16 @@ export default function TempPage() {
         });
   
         const data = await res.json();
-  
-        const match = data.message.match(/created (\d+)/);
-        const universeID = match ? match[1] : null;
+
+        const universeID = data.message;
+
+        if (universeID) {
+          sessionStorage.setItem('universeID', universeID);
+          sessionStorage.setItem('uterm-temperature', selected.value);
+          router.push('/bootup');
+        } else {
+          console.error('Could not extract universe ID from response');
+        }
   
         if (universeID) {
           sessionStorage.setItem('universeID', universeID);

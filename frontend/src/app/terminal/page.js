@@ -108,12 +108,13 @@ export default function TerminalPage() {
   
       if (Array.isArray(suggestions)) {
         if (suggestions.length === 1) {
-          setInput(suggestions[0]); // autofill
+          setInput(suggestions[0]);
         } else if (suggestions.length > 1) {
-          setHistory((prev) => [...prev, `* ${input}`, suggestions.join('  ')]);
+          setHistory((prev) => [suggestions.join('  '), ...prev]);
         } else {
           setHistory((prev) => [...prev, `* ${input}`, 'No suggestions']);
         }
+        setAutoScroll(true);
       }
     }
   }

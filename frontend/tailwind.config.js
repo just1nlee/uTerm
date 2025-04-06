@@ -17,6 +17,15 @@ module.exports = {
       colors: {
         bone: '#d0d0d0',
       },
+      animation: {
+        blink: 'blink 1s step-start infinite'
+      },
+      keyframes: {
+        blink: {
+          '100%, 0%': {opacity: '0'},
+          '50%': {opacity: '1'},
+        },
+      },
       keyframes: {
         'scroll-up': {
           '0%': { transform: 'translateY(100%)', opacity: '0' },

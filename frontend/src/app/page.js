@@ -1,14 +1,25 @@
 'use client'
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TerminalWindow from './components/TerminalWindow';
 import UTermLogo from './components/uTermLogo';
 
-export default function HomePage() {
+export default function TerminalScreen() {
   const router = useRouter();
 
-  // Listen for ENTER key to navigate to /temp
+  const allLines = [...blackHole, ...title, ...screenText];
+
+  const [phase, setPhase] = useState('blackHole');
+  const [linesShown, setLinesShown] = useState(0);
+
+  useEffect(() => {
+    if (linesShown < allLines.length) {
+      const timeout = setTimeout(() => setLinesShown((n) => n + 1), 30);
+      return () => clearTimeout(timeout);
+    }
+  }, [linesShown]);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Enter') {

@@ -155,7 +155,7 @@ Type 'exit' to return to the homepage.
       setInput('');
       return;
     }
-
+    
     let output = '';
     
     if (builtInCommands[cmd]) {
@@ -188,7 +188,7 @@ Type 'exit' to return to the homepage.
         }),
       });
   
-      if(!res.ok){
+      if (!res.ok) {
         const errorData = await res.json();
         output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
       } else {
@@ -220,37 +220,53 @@ Type 'exit' to return to the homepage.
     setAutoScroll(true);
   };
 
-  const builtInCommands = {
-    echo: {
-      description: 'Echo a passed string.',
-      usage: 'echo <string>',
-      fn: (...args) => args.join(' ')
-    },
-    help: {
-      description: 'List commands.',
-      usage: 'help',
-      fn: () => {
-        const cmdList = Object.keys(builtInCommands);
-        const descriptions = cmdList.map(cmd => 
-          `${cmd.padEnd(10)} - ${builtInCommands[cmd].description}`
-        );
-        return descriptions.join('\n');
-      }
-    },
-    clear: {
-      description: 'Clear terminal history.',
-      usage: 'clear',
-      fn: () => {
-        setHistory([]);
-        return '';
-      }
-    },
-    exit: {
-      description: 'Exit the terminal and return to homepage.',
-      usage: 'exit',
-      fn: () => router.push('/'),
-    },
-  };
+  // Define the fixed order for commands.
+const commandOrder = ['help', 'clear', 'bigbang', 'ls', 'tree', 'cat', 'echo', 'exit'];
+
+// Define a helpInfo object that contains every command's description and usage.
+const helpInfo = {
+  help: { description: 'List commands.', usage: 'help' },
+  clear: { description: 'Clear terminal history.', usage: 'clear' },
+  bigbang: { description: 'Reset the universe.', usage: 'bigbang' },
+  ls: { description: 'List files and directories.', usage: 'ls [options] [path]' },
+  tree: { description: 'Display explored universe.', usage: 'tree'},
+  cat: { description: 'Display file contents.', usage: 'cat <filename>' },
+  echo: { description: 'Echo a passed string.', usage: 'echo <string>' },
+  exit: { description: 'Exit the terminal and return to homepage.', usage: 'exit' },
+};
+
+let builtInCommands = {
+  help: {
+    description: 'List commands.',
+    usage: 'help',
+    fn: () => {
+      // Build help output using our helpInfo object.
+      const descriptions = commandOrder.map(cmd => {
+        const info = helpInfo[cmd];
+        return `${cmd.padEnd(10)} - ${info.description}\n`;
+      });
+      return descriptions;
+    }
+  },
+  clear: {
+    description: 'Clear terminal history.',
+    usage: 'clear',
+    fn: () => {
+      setHistory([]);
+      return '';
+    }
+  },
+  echo: {
+    description: 'Echo a passed string.',
+    usage: 'echo <string>',
+    fn: (...args) => args.join(' ')
+  },
+  exit: {
+    description: 'Exit the terminal and return to homepage.',
+    usage: 'exit',
+    fn: () => router.push('/')
+  },
+}; 
 
   return (
     <TerminalWindow>

@@ -16,9 +16,34 @@ module.exports = {
       },
       colors: {
         bone: '#d0d0d0',
-      }
+      },
+      keyframes: {
+        'scroll-up': {
+          '0%': { transform: 'translateY(100%)', opacity: '0' },
+          '100%': { transform: 'translateY(0%)', opacity: '1' },
+        },
+        'line-wipe': {
+          '0%': {
+            transform: 'translateY(0%)',
+            opacity: '0',
+            visibility: 'visible',
+          },
+          '99%': {
+            opacity: '0.01',
+            visibility: 'visible',
+          },
+          '100%': {
+            transform: 'translateY(-100%)',
+            opacity: '0',
+            visibility: 'hidden',
+          },
+        },
+      },
+      animation: {
+        'scroll-up': 'scroll-up 0.8s steps(6) forwards',
+        'line-wipe': 'line-wipe 0.6s steps(6) forwards',
+      },
     },
   },
   plugins: [],
-}
-
+};

@@ -21,12 +21,23 @@ export default function HomePage() {
   }, [router]);
 
   return (
+    <>
+    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+      <div className="w-[336px] h-[372px] bg-black animate-line-wipe" />
+    </div>
+
     <TerminalWindow>
-      <div className="flex flex-col items-center justify-center text-center px-6 py-12 w-full font-vt text-bone">
-        <UTermLogo />
-        <p className="mb-4 text-[1.83rem] leading-snug">░▒▓█ A terminal to the observable universe █▓▒░</p>
-       <p className="text-[1.83rem] leading-snug">press [ ENTER ] to continue</p>
+      <div className="relative w-full h-full overflow-hidden">
+    
+        <div className="absolute inset-0 z-40 bg-black animate-line-wipe pointer-events-none rounded-[12px]" />
+
+        <div className="absolute inset-x-0 bottom-0 animate-scroll-up px-6 py-12 text-center flex flex-col items-center justify-center text-bone">
+          <UTermLogo />
+          <p className="mt-6 text-[1.83rem] leading-snug">░▒▓█ A terminal to the observable universe █▓▒░</p>
+          <p className="text-[1.83rem] leading-snug">press [ ENTER ] to continue</p>
+        </div>
       </div>
     </TerminalWindow>
-    );
+  </>
+); 
 }

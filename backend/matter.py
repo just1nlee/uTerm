@@ -51,7 +51,7 @@ class Text(File):
         self.content: str = ""
 
     def generateContent(self, temperature: float):
-        txt = generateText(self.name, temperature)
+        txt = generateText(self.name, self.pwd, temperature)
         if txt == None:
             return 1
         

@@ -3,6 +3,7 @@ from google import genai
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -134,19 +135,35 @@ def generatePrompt(arg: str, json:str, wd: str, temperature: int):
         """
     return output
 
+def format_to_snake_case_csv(input_str: str) -> str:
+    words = input_str.strip().split(',')
+    result = []
+
+    for word in words:
+        word = word.strip()
+        snake = re.sub(r'[^a-zA-Z0-9]+', '_', word).lower()
+        snake = re.sub(r'_+', '_', snake).strip('_')
+        if snake:
+            result.append(snake)
+
+    return ','.join(result)
+
+
 def generateDirs(arg: str, wd:str, json:str, temperature: int):
     arg = arg.strip()
 
     try:
         response = client.models.generate_content(model=GEMINI_MODEL, contents=generatePrompt(arg, json, wd, temperature), config={"temperature": temperature, "top_k": 10})
-        return [name.strip() for name in response.text.strip().split(',')]
+        cleaned_csv = format_to_snake_case_csv(response.text)
+        return [name.strip() for name in cleaned_csv.split(',') if name.strip()]
+    
     except Exception as e:
         return None
 
 # Generate content for text file
-def generateText(arg: str, temperature: int):
+def generateText(arg: str, cwd: str, temperature: int):
     arg = arg.strip()
-    input = f"I have created a universe-themed terminal, where we start with the universe and we use AI to generate name of directories to traverse through. You need to generate the contents of the file {arg}. Your output NEEDS to be only the contents of the file and nothing else. Don't start the response with anything, don't end the response with anything"
+    input = f"I have created a universe-themed terminal, where we start with the universe and we use AI to generate name of directories to traverse through. You need to generate the contents of the file {arg}. Your output NEEDS to be only the contents of the file and nothing else. Don't start the response with anything, don't end the response with anything, Make sure that the content of the file is in the context of the cwd: {cwd}"
     
     try:
         response = client.models.generate_content(model=GEMINI_MODEL, contents=input, config={"temperature": temperature, "top_k": 10})

@@ -24,8 +24,8 @@ class Directory(File):
         super().__init__("dir", name, parent)
         self.content: List[File] = []
 
-    def generateContent(self, temperature: float):
-        names = generateDirs(self.name, temperature)
+    def generateContent(self, temperature: float, wd: str):
+        names = generateDirs(self.name, wd, temperature)
         if not names:
             return 1
         dirs = []
@@ -93,7 +93,7 @@ class Universe:
         for file in self.currentnode.content:
             if file.type == "dir" and file.name == directory:
                 if not file.content:
-                    if file.generateContent(self.temperature):
+                    if file.generateContent(self.temperature, self.wd):
                         return "GEMINI_ERROR"
                 self.currentnode = file
                 self.wd += f"/{directory}"
@@ -118,7 +118,7 @@ class Universes:
 
     def createUniverse(self, temperature: float):
         directory = Directory(name="universe")
-        directory.generateContent(temperature)
+        directory.generateContent(temperature, "/universe")
         universeid = min(self.available)
         universe = Universe(universeid, directory, temperature)
         self.universes[universeid] = universe
@@ -138,7 +138,7 @@ class Universes:
     def bigbang(self, universeid: int, temperature: float):
         del self.universes[universeid]
         directory = Directory(name="universe")
-        directory.generateContent(temperature)
+        directory.generateContent(temperature, "/universe")
         universe = Universe(universeid, directory, temperature)
         self.universes[universeid] = universe
         return 0

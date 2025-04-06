@@ -13,7 +13,7 @@ def generatePrompt(arg: str, json:str, wd: str, temperature: int):
     output = ""
 
     if temperature == 0.1:
-        f"""
+        output = f"""
         You are a virtual system explorer (terminal) navigating a hierarchical file system that represents the universe. Each directory corresponds to a physical object, place, or concept (thing). You are currently exploring the directory: "{arg}".
         Generate only the contents that logically and physically belong inside this directory, but maintain a very minimal scope. Generate children that are direct prodecessors to the parent. Follow these strict rules to maintain structural and conceptual integrity:
 
@@ -50,9 +50,10 @@ def generatePrompt(arg: str, json:str, wd: str, temperature: int):
         Each entry must reflect the scale, properties, and uniqueness of {arg} only. Make sure it adheres to the format, guideed by the examples. Look at the cwd for context on generating the directories, and look at the entire tree of universe to generate more context and generate directories specifically related to the path that have not already been outputted     
 
         The content you generate should be strictly factual. Very rarely, you can generate hidden (dot) files including secret lore, you can be somewhat creative with this.          
+        ensure you adhere to the strict output format
         """
     elif temperature == 0.5:
-        f"""
+        output = f"""
         You are a virtual system explorer (terminal) navigating a hierarchical file system that represents the universe. Each directory corresponds to a physical object, place, or concept (thing). You are currently exploring the directory: "{arg}".
         Generate only the contents that logically and physically belong inside this directory, but maintain a very minimal scope. Generate children that are direct prodecessors to the parent. Follow these strict rules to maintain structural and conceptual integrity:
 
@@ -90,9 +91,10 @@ def generatePrompt(arg: str, json:str, wd: str, temperature: int):
 
         The content you generate should be mostly factual, but allow for some creativity and leeway. For example, sometimes generate things like space exploration logs, or evidence of lost civilizations, or advancements in society, etc (you can come up with other stuff). Be creative but be grounded, this is still our universe. You can also rarely generate some hidden (dot) files including lore, conspiracies, top secret data, basically things that could technically exist
         
+        ensure you adhere to the strict output format
         """
     elif temperature == 0.9:
-        f"""
+        output = f"""
         You are a virtual system explorer (terminal) navigating a hierarchical file system that represents the universe. Each directory corresponds to a physical object, place, or concept (thing). You are currently exploring the directory: "{arg}".
         Generate only the contents that logically and physically belong inside this directory, but maintain a very minimal scope. Generate children that are direct prodecessors to the parent. Follow these strict rules to maintain structural and conceptual integrity:
 
@@ -115,7 +117,7 @@ def generatePrompt(arg: str, json:str, wd: str, temperature: int):
         - Represent forces, behaviors, or configuration properties that apply at this scale with `.config` files.
         - Keep file contents scoped to this entity only — if it governs a larger or smaller system, it belongs elsewhere.
 
-        OUTPUT FORMAT EXAMPLE:
+        STRICT OUTPUT FORMAT EXAMPLE:
         subdirectory,subdirectory,subdirectory,file.txt,file.txt,file.txt,file.config
 
         EXAMPLES:
@@ -126,6 +128,8 @@ def generatePrompt(arg: str, json:str, wd: str, temperature: int):
         Each entry must reflect the scale, properties, and uniqueness of {arg} only. Make sure it adheres to the format, guideed by the examples. Look at the cwd for context on generating the directories, and look at the entire tree of universe to generate more context and generate directories specifically related to the path that have not already been outputted     
 
         The content you generate should be chaotic. Think of a parallel uiverse with a different timeline, or different events, or different galaxies/stars/planets. For example, civilization expanding to other planets, or life going extinct, or space wars, or dyson spheres, or new technology
+
+        ensure you adhere to the strict output format
         
         """
     return output

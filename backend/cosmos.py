@@ -154,14 +154,12 @@ def generateDirs(arg: str, wd:str, json:str, temperature: int):
 
     try:
         response = client.models.generate_content(model=GEMINI_MODEL, contents=generatePrompt(arg, json, wd, temperature), config={"temperature": temperature, "top_k": 10})
-        cleaned_csv = format_to_snake_case_csv(response.text)
-        return [name.strip() for name in cleaned_csv.split(',') if name.strip()]
-    
+        return [name.strip() for name in response.text.strip().split(',')]
     except Exception as e:
         return None
 
 # Generate content for text file
-def generateText(arg: str, cwd: str, temperature: int):
+def generateText(arg: str, cwd: str,temperature: int):
     arg = arg.strip()
     input = f"I have created a universe-themed terminal, where we start with the universe and we use AI to generate name of directories to traverse through. You need to generate the contents of the file {arg}. Your output NEEDS to be only the contents of the file and nothing else. Don't start the response with anything, don't end the response with anything, Make sure that the content of the file is in the context of the cwd: {cwd}"
     

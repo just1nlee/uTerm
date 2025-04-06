@@ -54,7 +54,7 @@ export default function TerminalPage() {
           {
             method: 'GET',
             headers: {
-              'Content-Type': 'application/json',
+              'X-API-Key': '18ca0b78f576cf69741d7fac47570aad'
             },
           }
         );
@@ -64,9 +64,9 @@ export default function TerminalPage() {
           output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
           setHistory((prev) => [...prev, `* ${input}`, output]);
           return;
+        } else{
+          data = await res.json();
         }
-  
-        data = await res.json();
       } catch (err) {
         output = `Client error: ${err.message}`;
         setHistory((prev) => [...prev, `* ${input}`, output]);

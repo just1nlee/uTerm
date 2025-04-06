@@ -18,7 +18,7 @@ export default function TerminalPage() {
 
   // Welcome message text
   const welcomeMessage = `
-░▒▓█ welcome to uTerm, a terminal-based universe explorer  █▓▒░
+░▒▓█ welcome to uTerm, a terminal-based universe explorer
 
 Type 'help' to see available commands.
 Type 'exit' to return to the homepage.

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import TerminalWindow from './components/TerminalWindow';
+import UTermLogo from './components/uTermLogo';
 
 export default function HomePage() {
   const router = useRouter();
@@ -21,12 +22,11 @@ export default function HomePage() {
 
   return (
     <TerminalWindow>
-      <div className="flex flex-col items-center justify-center text-center p-6 w-full">
-        <p className="mb-6 text-lg">░▒▓█ A terminal to the observable universe █▓▒░</p>
-        <h1 className="animate-pulse text-sm">press [ ENTER ] to continue</h1>
+      <div className="flex flex-col items-center justify-center text-center px-6 py-12 w-full font-vt text-bone">
+        <UTermLogo />
+        <p className="mb-4 text-[1.83rem] leading-snug">░▒▓█ A terminal to the observable universe █▓▒░</p>
+       <p className="text-[1.83rem] leading-snug">press [ ENTER ] to continue</p>
       </div>
-      <div className="p-10">
-    </div>
     </TerminalWindow>
     );
 }

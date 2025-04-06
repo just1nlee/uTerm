@@ -1,8 +1,60 @@
 from pydantic import BaseModel
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Header, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from matter import Universes, Universe
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+import os
+from dotenv import load_dotenv
+from datetime import datetime, timedelta
+from contextlib import asynccontextmanager
+import asyncio
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async def cleanup_loop():
+        while True:
+            await asyncio.sleep(60)
+            now = datetime.utcnow()
+            for uid, universe in list(universes.universes.items()):
+                if (now - universe.lastused) > timedelta(minutes=5):
+                    universes.deleteUniverse(uid)
+                    print(f"[CLEANUP] Universe {uid} deleted due to inactivity")
+
+    task = asyncio.create_task(cleanup_loop())
+
+    yield  # app starts here
+
+    task.cancel()
+
+app = FastAPI(lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://universeterminal.com", "http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "DELETE"],
+    allow_headers=["Content-Type", "Authorization", "X-API-Key"])
+
+
+load_dotenv()
+
+def verify_api_key(x_api_key: str = Header(...)):
+    if x_api_key != os.getenv("FRONTEND_KEY"):
+        raise HTTPException(status_code=403, detail="Invalid API key")
+
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+
+app.add_middleware(SlowAPIMiddleware)
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request, exc):
+    return JSONResponse(status_code=429, content={"detail": "Too many requests"})
+
+
 universes = Universes()
 
 class Create(BaseModel):
@@ -19,14 +71,17 @@ def rootRequest():
 
 
 @app.post("/create/")
-def createRequest(body: Create):
+@limiter.limit("5/second")
+def createRequest(request: Request, body: Create, _: None = Depends(verify_api_key)):
     temperature = body.temperature
     universeid = universes.createUniverse(temperature)
-    return {"message": f"created {universeid} with temp {temperature}"}
+    universes.getUniverse(universeid)._touch()
+    return {"message": f"{universeid}"}
 
 
 @app.post("/command/")
-def commandRequest(body: Command):
+@limiter.limit("5/second")
+def commandRequest(request: Request, body: Command, _: None = Depends(verify_api_key)):
     universeid = body.universeid
     uinput = body.command
     output = {"error": f"command {uinput} not found"}
@@ -34,6 +89,8 @@ def commandRequest(body: Command):
 
     if not universe:
         return {"error": "universe not found"}
+    
+    universe._touch()
     
     if uinput == "ls":
         output = {"message": universe.ls()}
@@ -76,6 +133,7 @@ def commandRequest(body: Command):
     
 
 @app.delete("/{universeid}")
-def deleteRequest(universeid: int):
+@limiter.limit("5/second")
+def deleteRequest(request: Request, universeid: int, _: None = Depends(verify_api_key)):
     universes.deleteUniverse(universeid)
     return {"message": f"deleted {universeid}"}

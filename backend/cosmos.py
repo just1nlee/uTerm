@@ -44,7 +44,7 @@ EXAMPLES:
 For context generating text, the cwd is {wd}
 And this is the current structure of the universe: {json}
 
-Each entry must reflect the scale, properties, and uniqueness of {arg} only.
+Each entry must reflect the scale, properties, and uniqueness of {arg} only. Make sure it adheres to the format, guideed by the examples. Look at the cwd for context on generating the directories, and look at the entire tree of universe to generate more context and generate directories specifically related to the path that have not already been outputted
 """
 def generateDirs(arg: str, wd:str, json:str, temperature: int):
     arg = arg.strip()

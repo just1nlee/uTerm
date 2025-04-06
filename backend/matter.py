@@ -73,6 +73,9 @@ class Universe:
         self.temperature: float = temperature
         self.lastused: datetime = datetime.utcnow()
 
+    def _touch(self):
+        self.lastused = datetime.utcnow()
+
     def pwd(self):
         return self.wd
     

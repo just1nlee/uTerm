@@ -5,7 +5,7 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from typing import List, Union, Literal, Optional
 from cosmos import generateDirs, generateText, generateInfo
-from datetime import datetime, timedelta
+from datetime import datetime
 from dotenv import load_dotenv
 import json
 
@@ -122,6 +122,40 @@ class Universe:
                         return "GEMINI_ERROR"
                 return file.content
         return ""
+    
+            
+    def tab(self, input: str):
+        results = []
+        
+        if " " not in input:
+            for command in ["cd ", "cat "]:
+                if command.startswith(input):
+                    results.append(command)
+            return results
+
+        input_parts = input.split(" ")
+        cmd = input_parts[0]
+        if len(input_parts) == 1:
+            arg = ""
+        if len(input_parts) == 2:
+            arg = input_parts[1]
+        else:
+            return []
+
+        if cmd == "cd":
+            for file in self.currentnode.content:
+                if file.type == "dir" and file.name.startswith(arg):
+                    results.append(file.name)
+        elif cmd == "cat":
+            for file in self.currentnode.content:
+                if file.type == "txt" and file.name.startswith(arg):
+                    results.append(file.name)
+        else:
+            return []
+
+        if len(results) == 1:
+            return f"{cmd} {results[0]}"
+        return results
 
 
 class Universes:

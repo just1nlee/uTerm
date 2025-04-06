@@ -1,35 +1,35 @@
 'use client'
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TerminalWindow from './components/TerminalWindow';
-import blackHole from '../components/blackHole';
-import screenText from '../components/TypingText';
+import blackHole from './components/BlackHole';
+import screenText from './components/TypingText';
 
 export default function TerminalScreen() {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [phase, setPhase] = useState('blackHole')
-  const [linesShown, setLinesShown] = useState(0)
+  const [phase, setPhase] = useState('blackHole');
+  const [linesShown, setLinesShown] = useState(0);
 
   useEffect(() => {
     if (phase === 'blackHole' && linesShown < blackHole.length) {
-      const timeout = setTimeout(() => { setLinesShown((prev) => prev + 1)}, 30)
-      return () => clearTimeout(timeout)
+      const timeout = setTimeout(() => setLinesShown((prev) => prev + 1), 30);
+      return () => clearTimeout(timeout);
     }
 
-    if(phase === 'blackHole' && linesShown >= blackHole.length){
-      setTimeout(() => { 
-        setPhase('screenText')
-        setLinesShown(0)
-      }, 30)
+    if (phase === 'blackHole' && linesShown >= blackHole.length) {
+      setTimeout(() => {
+        setPhase('screenText');
+        setLinesShown(0);
+      }, 20);
     }
 
-    if(phase === 'screenText' && linesShown < screenText.length){
-      const t = setTimeout(() => setLinesShown((n) => n + 1), 30)
-      return () => clearTimeout(t)
+    if (phase === 'screenText' && linesShown < screenText.length) {
+      const t = setTimeout(() => setLinesShown((n) => n + 1), 30);
+      return () => clearTimeout(t);
     }
-  }, [linesShown, phase])
+  }, [linesShown, phase]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -44,19 +44,18 @@ export default function TerminalScreen() {
 
   return (
     <TerminalWindow>
-    <div className="max-h-[500px] h-screen bg-black text-bone-400 font-mono text-xs leading-normal whitespace-pre items-center px-6 py-8 flex flex-col gap-6">
-      <div className="w-[60ch] mx-auto">
-      <pre className="text-left">
-        {blackHole.slice(0, phase === 'blackHole' ? linesShown : blackHole.length).join('\n')}
-      </pre>
-      {phase === 'screenText' && (
-        <pre className="text-center mx-auto">
-          {screenText.slice(0, linesShown).join('\n')}
-        </pre>
-      )}
+      <div className="max-h-[500px] h-screen bg-black text-bone-400 font-mono text-xs leading-normal whitespace-pre items-center px-6 py-8 flex flex-col gap-6">
+        <div className="w-[60ch] mx-auto">
+          <pre className="text-left">
+            {blackHole.slice(0, phase === 'blackHole' ? linesShown : blackHole.length).join('\n')}
+          </pre>
+          {phase === 'screenText' && (
+            <pre className="text-center mx-auto">
+              {screenText.slice(0, linesShown).join('\n')}
+            </pre>
+          )}
+        </div>
       </div>
-      <div className="p-10">
-    </div>
     </TerminalWindow>
-    );
+  );
 }

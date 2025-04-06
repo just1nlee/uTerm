@@ -42,14 +42,6 @@ export default function TempPage() {
         } else {
           console.error('Could not extract universe ID from response');
         }
-  
-        if (universeID) {
-          sessionStorage.setItem('universeID', universeID);
-          sessionStorage.setItem('uterm-temperature', selected.value);
-          router.push('/bootup');
-        } else {
-          console.error('Could not extract universe ID from response');
-        }
       } catch (err) {
         console.error('Failed to create universe:', err);
       }

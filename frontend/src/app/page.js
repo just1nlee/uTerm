@@ -1,69 +1,87 @@
 'use client'
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import TerminalWindow from './components/TerminalWindow';
 
-export default function HomePage() {
-  const router = useRouter();
+export default function TerminalScreen() {
+  const router = useRouter()
+
+  const black_hole = [
+    '                        +++++++++++++++++',
+    '                   ++++++++++++++++++++++++++++',
+    '               ++++++++++++++++++++++++     +++++++',
+    '            ++++++++++++++++++++++++++++++++    ++++++',
+    '          ++++++++++++++++++++++++++++++++++++++   ++++++',
+    '        ++++++++++++++                  +++++++++++    +++',
+    '       +++++++++++                    +      +++++++++   +++',
+    '      ++++++++++                         +    +++++++++   +++',
+    '     ++++++++++                            +     ++++++++   +++',
+    '     +++++++++                              ++    ++++++++   ++',
+    '     +++++++++                              +++   ++++++++  +++',
+    '     +++++++++                              +++   +++++++++  ++',
+    '     ++++++++++                          ++++++   +++++++++  ++',
+    '  +   ++++++++++++                     ++++++++   +++++++++  ++',
+    '  +    ++++++++++++++             +++++++++++    +++++++++   +',
+    '  ++    +++++++++++++++++++++++++++++++++++     +++++++++   +',
+    '   ++     ++++++++++++++++++++++++++++++     +++++++++++  +',
+    '     ++      +++++++++++++++++++++++++     +++++++++++',
+    '      ++++        +++++++++++++++       ++++++++++++',
+    '        +++++                       ++++++++++++++',
+    '          +++++++++++++++++++++++++++++++++++++',
+    '             +++++++++++++++++++++++++++++',
+    '                 ++++++++++++++++++++',
+    '',
+  ]
+
+  const screen_text = [
+    '░▒▓█ A terminal to the observable universe █▓▒░',
+    'press [ ENTER ] to continue'
+  ]
+
+  const [phase, setPhase] = useState('black_hole')
   const [linesShown, setLinesShown] = useState(0)
 
-  const ascii = `                       ++++++++++++++++++
-                   ++++++++++++++++++++++++++++
-               ++++++++++++++++++++++++     +++++++
-            ++++++++++++++++++++++++++++++++    ++++++
-          ++++++++++++++++++++++++++++++++++++++   ++++++
-        ++++++++++++++                  +++++++++++    +++
-       +++++++++++                    +      +++++++++   +++
-      ++++++++++                         +    +++++++++   +++
-     ++++++++++                            +     ++++++++   +++
-     +++++++++                              ++    ++++++++   ++
-     +++++++++                              +++   ++++++++  +++
-     +++++++++                              +++   +++++++++  ++
-     ++++++++++                          ++++++   +++++++++  ++
-  +   ++++++++++++                     ++++++++   +++++++++  ++
-  +    ++++++++++++++             +++++++++++    +++++++++   +
-  ++    +++++++++++++++++++++++++++++++++++     +++++++++   +
-   ++     ++++++++++++++++++++++++++++++     +++++++++++  +
-     ++      +++++++++++++++++++++++++     +++++++++++
-      ++++        +++++++++++++++       ++++++++++++
-        +++++                       ++++++++++++++
-          +++++++++++++++++++++++++++++++++++++
-             +++++++++++++++++++++++++++++
-                 ++++++++++++++++++++
+  useEffect(() => {
+    if (phase === 'black_hole' && linesShown < black_hole.length) {
+      const timeout = setTimeout(() => { setLinesShown((prev) => prev + 1)}, 20)
+      return () => clearTimeout(timeout)
+    }
 
+    if(phase === 'black_hole' && linesShown >= black_hole.length){
+      setTimeout(() => { 
+        setPhase('screen_text')
+        setLinesShown(0)
+      }, 60)
+    }
 
-`.trim().split('\n')
-
-useEffect(() => {
-  if(linesShown < ascii.length){
-    const t = setTimeout(() => setLinesShown(linesShown + 1), 50)
-    return () => clearTimeout(t)
-  }
-}, [linesShown])
+    if(phase === 'screen_text' && linesShown < screen_text.length){
+      const t = setTimeout(() => setLinesShown((n) => n + 1), 30)
+      return () => clearTimeout(t)
+    }
+  }, [linesShown, phase])
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Enter') {
-        router.push('/temp');
+      if (e.key === 'Enter' && linesShown >= screenContent.length) {
+        router.push('/temp')
       }
-    };
+    }
 
-    window.addEventListener('keydown', handleKeyDown);
-
-    // Cleanup the event listener when you leave the page
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [router]);
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [router, linesShown])
 
   return (
-    <TerminalWindow>
-      <div className="flex flex-col items-center justify-center text-white text-center p-6 w-full">
-      <pre className="font-mono text-white text-xs leading-normal text-left whitespace-pre-wrap">
-       {ascii.slice(0, linesShown).join('\n')}
-      </pre> 
-        <p className="mb-6 text-lg">░▒▓█ A terminal to the observable universe █▓▒░</p>
-        <h1>press [ ENTER ] to continue</h1>
-      </div>
-    </TerminalWindow>
-  ); 
+    <div className="h-screen bg-black text-white-400 font-mono text-s leading-normal whitespace-pre items-center overflow-y-auto px-6 py-8 flex flex-col gap-6">
+      <pre className="text-left">
+        {black_hole.slice(0, phase === 'black_hole' ? linesShown : black_hole.length).join('\n')}
+      </pre>
+      {phase === 'screen_text' && (
+        <pre className="text-center mx-auto">
+          {screen_text.slice(0, linesShown).join('\n')}
+        </pre>
+      )}
+    </div>
+  )
 }

@@ -54,15 +54,26 @@ export default function TempPage() {
 
   return (
     <TerminalWindow>
-      <div className="h-[500px] text-bone flex flex-col items-start justify-start pt-10 px-10">
-        <h1 className="mb-2 text-center w-full">Select your creativity temperature:</h1>
+      <div className="h-[500px] w-full text-bone flex flex-col justify-start px-8">
+        <h1 className="mt-10 text-center w-full">Select your creativity temperature:</h1>
   
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1 mt-12 mb-4 pl-16">
           {options.map((opt, i) => (
-            <div key={i} className="text-bone flex items-center min-h-[1.5rem]">
-              <span className="inline-block w-[1.5ch]">{i === selectedIndex ? '>' : '\u00A0'}</span>
-              <span className={`ml-8 ${i === selectedIndex ? 'animate-blink' : ''}`}>{opt.label}</span>
-              <span className="ml-4">{i === selectedIndex ? opt.description : '\u00A0'}</span>
+            <div key={i} className="text-bone flex items-center min-h-[2rem] leading-none">
+              <span className="w-4 inline-block text-right">
+                {i === selectedIndex ? '>' : ' '}
+              </span>
+  
+              <span className={`w-32 ml-10 ${i === selectedIndex ? 'animate-blink' : ''}`}>
+                {opt.label}
+              </span>
+  
+              <span 
+                className="text-left"
+                style={{ opacity: i === selectedIndex ? 1 : 0 }}
+              >
+                {opt.description}
+              </span>
             </div>
           ))}
         </div>

@@ -48,6 +48,7 @@ Each entry must reflect the scale, properties, and uniqueness of {arg} only.
 """
 def generateDirs(arg: str, wd:str, temperature: int):
     arg = arg.strip()
+    
 
     # Send prompt to Gemini
     try:

@@ -142,4 +142,3 @@ class Universes:
         universe = Universe(universeid, directory, temperature)
         self.universes[universeid] = universe
         return 0
-

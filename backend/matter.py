@@ -50,8 +50,8 @@ class Text(File):
         super().__init__("txt", name, parent)
         self.content: str = ""
 
-    def generateContent(self, temperature: float):
-        txt = generateText(self.name, self.pwd, temperature)
+    def generateContent(self, pwd:str, temperature: float):
+        txt = generateText(self.name, pwd, temperature)
         if txt == None:
             return 1
         
@@ -113,7 +113,7 @@ class Universe:
         for file in self.currentnode.content:
             if file.type == "txt" and file.name == filename:
                 if not file.content:
-                    if file.generateContent(self.temperature):
+                    if file.generateContent(self.pwd, self.temperature):
                         return "GEMINI_ERROR"
                 return file.content
         return ""

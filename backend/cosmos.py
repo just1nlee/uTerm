@@ -134,7 +134,7 @@ def generateDirs(arg: str, wd:str, json:str, temperature: int):
     arg = arg.strip()
 
     try:
-        response = client.models.generate_content(model=GEMINI_MODEL, contents=generatePrompt(arg, json, wd), config={"temperature": temperature, "top_k": 10})
+        response = client.models.generate_content(model=GEMINI_MODEL, contents=generatePrompt(arg, json, wd, temperature), config={"temperature": temperature, "top_k": 10})
         return [name.strip() for name in response.text.strip().split(',')]
     except Exception as e:
         return None

@@ -31,6 +31,9 @@ export default function TerminalScreen() {
     '             +++++++++++++++++++++++++++++',
     '                 ++++++++++++++++++++',
     '',
+    '',
+    '',
+    '',
   ]
 
   const screen_text = [
@@ -43,7 +46,7 @@ export default function TerminalScreen() {
 
   useEffect(() => {
     if (phase === 'black_hole' && linesShown < black_hole.length) {
-      const timeout = setTimeout(() => { setLinesShown((prev) => prev + 1)}, 20)
+      const timeout = setTimeout(() => { setLinesShown((prev) => prev + 1)}, 30)
       return () => clearTimeout(timeout)
     }
 
@@ -73,6 +76,7 @@ export default function TerminalScreen() {
 
   return (
     <div className="h-screen bg-black text-white-400 font-mono text-s leading-normal whitespace-pre items-center overflow-y-auto px-6 py-8 flex flex-col gap-6">
+      <div className="w-[60ch] mx-auto">
       <pre className="text-left">
         {black_hole.slice(0, phase === 'black_hole' ? linesShown : black_hole.length).join('\n')}
       </pre>
@@ -81,6 +85,7 @@ export default function TerminalScreen() {
           {screen_text.slice(0, linesShown).join('\n')}
         </pre>
       )}
+      </div>
     </div>
   )
 }

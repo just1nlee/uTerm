@@ -7,6 +7,7 @@ from typing import List, Union, Literal, Optional
 from cosmos import generateDirs, generateText, generateInfo
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 MAX_UNIVERSES = int(os.getenv("MAX_UNIVERSES"))
@@ -18,14 +19,25 @@ class File:
         self.name = name
         self.parent = parent
 
+    def to_dict(self):
+        if self.type == "dir" and self.content:
+            return {
+                "name": self.name,
+                "contents": [child.to_dict() for child in self.content]
+            }
+        else:
+            return {
+                "name": self.name
+            }
+
 
 class Directory(File):
     def __init__(self, name: str, parent: Optional[Directory] = None):
         super().__init__("dir", name, parent)
         self.content: List[File] = []
 
-    def generateContent(self, temperature: float, wd: str):
-        names = generateDirs(self.name, wd, temperature)
+    def generateContent(self, temperature: float, wd: str, json: str):
+        names = generateDirs(self.name, wd, json, temperature)
         if not names:
             return 1
         dirs = []
@@ -68,8 +80,7 @@ class Universe:
         return generateInfo(self.currentnode.name, self.temperature)
     
     def tree(self):
-        #finish
-        return 0
+        return json.dumps(self.universenode.to_dict())
 
     def ls(self):
         output = ""
@@ -93,7 +104,7 @@ class Universe:
         for file in self.currentnode.content:
             if file.type == "dir" and file.name == directory:
                 if not file.content:
-                    if file.generateContent(self.temperature, self.wd):
+                    if file.generateContent(self.temperature, self.tree(), self.wd):
                         return "GEMINI_ERROR"
                 self.currentnode = file
                 self.wd += f"/{directory}"
@@ -118,7 +129,7 @@ class Universes:
 
     def createUniverse(self, temperature: float):
         directory = Directory(name="universe")
-        directory.generateContent(temperature, "/universe")
+        directory.generateContent(temperature,"", "/universe")
         universeid = min(self.available)
         universe = Universe(universeid, directory, temperature)
         self.universes[universeid] = universe
@@ -138,7 +149,7 @@ class Universes:
     def bigbang(self, universeid: int, temperature: float):
         del self.universes[universeid]
         directory = Directory(name="universe")
-        directory.generateContent(temperature, "/universe")
+        directory.generateContent(temperature, "", "/universe")
         universe = Universe(universeid, directory, temperature)
         self.universes[universeid] = universe
         return 0

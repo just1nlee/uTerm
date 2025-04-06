@@ -9,7 +9,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL")
 client = genai.Client(api_key=GEMINI_API_KEY)
 
-def generatePrompt(arg: str, wd: str):
+def generatePrompt(arg: str, json:str, wd: str):
     return f"""
 You are a virtual system explorer navigating a hierarchical file system that represents the universe. Each directory corresponds to a physical object, place, or concept (thing). You are currently exploring the directory: "{arg}".
 Generate only the contents that logically and physically belong inside this directory. Follow these strict rules to maintain structural and conceptual integrity:
@@ -37,22 +37,22 @@ OUTPUT FORMAT EXAMPLE:
 subdirectory,subdirectory,subdirectory,file.txt,file.txt,file.txt,file.config
 
 EXAMPLES:
--Input: The Observable Universe, Output: galaxy_clusters,cosmic_web,intergalactic_void,dark_matter_generation,general_relativity.txt,cosmic_expansioin.config,observable_limitations.config
+-Input: Universe, Output: galaxy_clusters,cosmic_web,intergalactic_void,dark_matter_generation,general_relativity.txt,cosmic_expansioin.config,observable_limitations.config
 -Input: Earth, Output: atmosphere,hydrosphere,lithosphere,biosphere,continents,oceans,human_civilization,magnetosphere.config,origin_of_life.txt,natural_cycles.txt
 -Input: Saudi Arabia, Output: riyadh,mecca,medina,rub_al_khali_desert,eastern_province,oil_reserves_distribution.config,islamic_heritage_and_pilgrimage.txt,climate.config
--Input: Proxima Centauri, Output: proxima_b,proxima_d,stellar_flare_regions,convective_envelope,photosphere,red_dwarf_characteristics.config,habitability_challenges.txt
 
 For context generating text, the cwd is {wd}
+And this is the current structure of the universe: {json}
 
 Each entry must reflect the scale, properties, and uniqueness of {arg} only.
 """
-def generateDirs(arg: str, wd:str, temperature: int):
+def generateDirs(arg: str, wd:str, json:str, temperature: int):
     arg = arg.strip()
-    
+
 
     # Send prompt to Gemini
     try:
-        response = client.models.generate_content(model=GEMINI_MODEL, contents=generatePrompt(arg, wd), config={"temperature": temperature, "top_k": 10})
+        response = client.models.generate_content(model=GEMINI_MODEL, contents=generatePrompt(arg, json, wd), config={"temperature": temperature, "top_k": 10})
         return [name.strip() for name in response.text.strip().split(',')]
     except Exception as e:
         return None

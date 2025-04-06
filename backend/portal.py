@@ -31,6 +31,7 @@ def commandRequest(body: Command):
     uinput = body.command
     output = {"error": f"command {uinput} not found"}
     universe = universes.getUniverse(universeid)
+
     if not universe:
         return {"error": "universe not found"}
     

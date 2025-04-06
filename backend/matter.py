@@ -154,7 +154,7 @@ class Universe:
             return []
 
         if len(results) == 1:
-            return f"{cmd} {results[0]}"
+            return [f"{cmd} {results[0]}"]
         return results
 
 

@@ -12,7 +12,7 @@ module.exports = {
     extend: {
       fontFamily: {
         body: ['var(--font-vt323)', 'monospace'],
-        JetBrains_Mono: ['var(--font-jetbrains)', 'monospace'],
+        press: ['var(--font-pressstart)', 'monospace'],
       },
       colors: {
         bone: '#d0d0d0',
@@ -49,8 +49,8 @@ module.exports = {
         },
       },
       animation: {
-        'scroll-up': 'scroll-up 0.8s steps(6) forwards',
-        'line-wipe': 'line-wipe 0.6s steps(6) forwards',
+        'scroll-up': 'scroll-up 1.25s steps(12) forwards',
+        'line-wipe': 'line-wipe 1.5s steps(2) forwards',
       },
     },
   },

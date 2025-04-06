@@ -15,6 +15,7 @@ export default function TerminalPage() {
   const [welcomeTyped, setWelcomeTyped] = useState(false);
   const [cursorBlink, setCursorBlink] = useState(true);
   const [cursorPosition, setCursorPosition] = useState(0);
+  const [treeOutput, setTreeOutput] = useState(null);
 
   // Welcome message text
   const welcomeMessage = `
@@ -24,7 +25,6 @@ Type 'help' to see available commands.
 Type 'exit' to return to the homepage.
 
 `;
-  const [treeOutput, setTreeOutput] = useState(null);
 
   useEffect(() => {
     const storedID = sessionStorage.getItem('universeID');
@@ -92,12 +92,14 @@ Type 'exit' to return to the homepage.
     }
   };
 
-  function PrintTree({ node, prefix = '', isLast = true }) {
+  function formatTree(node, prefix = '', isLast = true) {
     const lines = [];
-    const hasChildren = node.contents && node.contents.length > 0;
+    if (!node || typeof node !== 'object' || !node.name) return lines;
+  
+    const hasChildren = Array.isArray(node.contents) && node.contents.length > 0;
     const connector = prefix + (prefix ? (isLast ? '└── ' : '├── ') : '');
     lines.push(connector + node.name);
-
+  
     if (hasChildren) {
       const newPrefix = prefix + (isLast ? '    ' : '│   ');
       node.contents.forEach((child, i) => {
@@ -105,17 +107,16 @@ Type 'exit' to return to the homepage.
         lines.push(...formatTree(child, newPrefix, isLastChild));
       });
     }
+  
     return lines;
   }
 
   async function handleKeyDown(e) {
-    // Always update cursor position on key events
     setCursorPosition(e.target.selectionStart);
-
     if (e.key === 'Tab') {
       e.preventDefault();
       const trimmedInput = input.trim();
-  
+
       let data;
       let output;
   
@@ -167,9 +168,8 @@ Type 'exit' to return to the homepage.
     
     const [cmd, ...args] = trimmedInput.split(' ');
 
-    // Special logic for clear command
     if (cmd === 'clear') {
-      setHistory([]); // Clear everything.
+      setHistory([]);
       setInput('');
       return;
     }
@@ -212,7 +212,9 @@ Type 'exit' to return to the homepage.
       } else {
         const data = await res.json();
         if (cmd === 'tree') {
-          const treeLines = PrintTree(data.message);
+          const parsedTree = JSON.parse(data.message);
+          console.log('TREE RESPONSE:', parsedTree);
+          const treeLines = formatTree(parsedTree);
           setHistory((prev) => [...treeLines.reverse(), `* ${input}`, ...prev]);
           setInput('');
           setAutoScroll(true);
@@ -246,10 +248,8 @@ Type 'exit' to return to the homepage.
     setAutoScroll(true);
   };
 
-  // Define the fixed order for commands.
 const commandOrder = ['help', 'clear', 'bigbang', 'ls', 'tree', 'cat', 'echo', 'exit'];
 
-// Define a helpInfo object that contains every command's description and usage.
 const helpInfo = {
   help: { description: 'List commands.', usage: 'help' },
   clear: { description: 'Clear terminal history.', usage: 'clear' },
@@ -309,7 +309,7 @@ let builtInCommands = {
           {history.map((line, i) => (
             <div 
               key={i} 
-              className="w-full text-left text-xl text-bone whitespace-pre-wrap mb-1"
+              className="w-full text-left text-xl text-bone whitespace-pre-wrap mb-1 leading-none"
             >
               {line}
             </div>

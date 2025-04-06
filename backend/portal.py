@@ -1,44 +1,80 @@
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
+from matter import Universes, Universe
 
 app = FastAPI()
+universes = Universes()
 
-class Input(BaseModel):
+class Create(BaseModel):
+    temperature: float
+
+class Command(BaseModel):
+    universeid: int
     command: str
 
 
+@app.get("/")
+def rootRequest():
+    return {"message": "UTerm is online"}
+
+
 @app.post("/create/")
-def createRequest(body: Input):
-    temperature = body.command
-    return {"message": f"created with temp {temperature}"}
+def createRequest(body: Create):
+    temperature = body.temperature
+    universeid = universes.createUniverse(temperature)
+    return {"message": f"created {universeid} with temp {temperature}"}
 
 
 @app.post("/command/")
-def commandRequest(body: Input):
+def commandRequest(body: Command):
+    universeid = body.universeid
     uinput = body.command
+    output = {"error": f"command {uinput} not found"}
+    universe = universes.getUniverse(universeid)
+    if not universe:
+        return {"error": "universe not found"}
     
     if uinput == "ls":
-        return {"message": "ls command"}
+        output = {"message": universe.ls()}
     
     elif uinput == "pwd":
-        return {"message": "pwd command"}
+        output = {"message": universe.pwd()}
     
     elif uinput == "info":
-        return {"message": "info command"}
+        output = {"message": universe.info()}
+
+    elif uinput == "tree":
+        return {"message": universe.tree()}
     
     elif uinput == "bigbang":
-        return {"message": "bigbang command"}
+        temperature = universe.temperature
+        universes.bigbang(universeid, temperature)
+        output = {"message": "bigbang success"}
     
     elif uinput.startswith("cd"):
-        arg = uinput[3:]
-        return {"message": f"cd to {arg}"}
+        arg = uinput[3:].strip()
+        results = universe.cd(arg)
+        if not results:
+            output = {"message": "cd success"}
+        elif results == "GEMINI_ERROR":
+            raise HTTPException(status_code=404, detail="gemini failed")
+        else:
+            raise HTTPException(status_code=404, detail=f"cd: directory {arg} not found")
     
     elif uinput.startswith("cat"):
-        arg = uinput[4:]
-        return {"message": f"cat to {arg}"}
-
+        arg = uinput[4:].strip()
+        result = universe.cat(arg)
+        if not result:
+            raise HTTPException(status_code=404, detail=f"cat: file {arg} not found")
+        elif result == "GEMINI_ERROR":
+            raise HTTPException(status_code=404, detail="gemini failed")
+        else:
+            output = {"message": result}
+    
+    return output
+    
 
 @app.delete("/{universeid}")
-def deleteRequest(universeid: str):
-
+def deleteRequest(universeid: int):
+    universes.deleteUniverse(universeid)
     return {"message": f"deleted {universeid}"}

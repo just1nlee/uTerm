@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import TerminalWindow from './components/TerminalWindow';
 
 export default function TerminalScreen() {
   const router = useRouter()

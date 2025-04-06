@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import TerminalWindow from '../components/TerminalWindow';
 
 export default function TempPage() {
   const router = useRouter();
@@ -32,19 +33,21 @@ export default function TempPage() {
   }, []);
 
   return (
-    <div className="h-screen bg-black text-white font-mono flex flex-col items-center justify-center px-4">
+    <TerminalWindow>
+    <div className="h-[500px] bg-black text-white-400 font-mono text-xs flex flex-col items-center justify-center px-4">
       <h1 className="text-2xl mb-6">Select your creativity temperature:</h1>
 
-      <div className="flex flex-col gap-2 text-lg">
+      <div className="flex flex-col gap-2 text-lg font-mono">
         {options.map((opt, i) => (
           <div key={i} className={i === selectedIndex ? 'text-green-400' : 'text-gray-400'}>
-            {i === selectedIndex ? '> ' : '  '}
+            <span className="inline-block w-[1.5ch]">
+              {i === selectedIndex ? '>' : '\u00A0'}
+            </span>
             {opt.label}
           </div>
         ))}
       </div>
 
-      {/* 🔽 Description shows only when something is selected */}
       <div className="mt-4 text-sm text-gray-400 h-6">
         {options[selectedIndex].description}
       </div>
@@ -54,5 +57,6 @@ export default function TempPage() {
         Press [ ENTER ] to explore
       </div>
     </div>
+    </TerminalWindow>
   );
 }

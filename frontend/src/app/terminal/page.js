@@ -46,6 +46,7 @@ export default function TerminalPage() {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
+              'X-API-Key': process.env.NEXT_PUBLIC_BACKEND_KEY,
             },
           }
         );
@@ -101,7 +102,8 @@ export default function TerminalPage() {
     try {
       const res = await fetch('https://backend-4na6.onrender.com/command/', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json',
+        'X-API-Key': process.env.NEXT_PUBLIC_BACKEND_KEY},
         body: JSON.stringify({
           universeid: universeID,
           command: trimmedInput,

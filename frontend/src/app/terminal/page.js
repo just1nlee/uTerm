@@ -134,7 +134,7 @@ Type 'exit' to return to the homepage.
         if (!res.ok) {
           const errorData = await res.json();
           output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
-          setHistory((prev) => [...prev, `* ${input}`, output]);
+          setHistory((prev) => [...prev, output, `* ${input}`]);
           return;
         } else{
           data = await res.json();
@@ -151,7 +151,7 @@ Type 'exit' to return to the homepage.
         if (suggestions.length === 1) {
           setInput(suggestions[0]);
         } else if (suggestions.length > 1) {
-          setHistory((prev) => [`* ${input}`, suggestions.join('  '), ...prev]);
+          setHistory((prev) => [suggestions.join('  '), `* ${input}`, ...prev]);
         } else {
           setHistory((prev) => [`* ${input}`, 'No suggestions', ...prev]);
         }

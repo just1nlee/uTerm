@@ -1,6 +1,6 @@
 import requests
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "https://backend-4na6.onrender.com"
 
 def create_universe(temp: float) -> int:
     res = requests.post(f"{BASE_URL}/create/", json={"temperature": temp})

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from fastapi import FastAPI, Request, HTTPException, Header, Depends
+from fastapi import FastAPI, Request, HTTPException, Query, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from matter import Universes, Universe
@@ -29,14 +29,14 @@ async def lifespan(app: FastAPI):
     yield  # app starts here
 
     task.cancel()
-
+    
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://universeterminal.com", "http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-API-Key"])
+    allow_methods=["*"],
+    allow_headers=["*"])
 
 
 load_dotenv()
@@ -79,14 +79,20 @@ def createRequest(request: Request, body: Create, _: None = Depends(verify_api_k
     return {"message": f"{universeid}"}
 
 
+@app.get("/tab/")
+@limiter.limit("5/second")
+def tabRequest(request: Request, universeid: int = Query(...), command:str = Query(...), _: None = Depends(verify_api_key)):
+    universe = universes.getUniverse(universeid)
+    if not universe:
+        return {"error": "universe not found"}
+    return {"message": universe.tab(command)}
+
 @app.post("/command/")
 @limiter.limit("5/second")
 def commandRequest(request: Request, body: Command, _: None = Depends(verify_api_key)):
     universeid = body.universeid
     uinput = body.command
-    output = {"error": f"command {uinput} not found"}
     universe = universes.getUniverse(universeid)
-
     if not universe:
         return {"error": "universe not found"}
     
@@ -128,6 +134,10 @@ def commandRequest(request: Request, body: Command, _: None = Depends(verify_api
             raise HTTPException(status_code=404, detail="gemini failed")
         else:
             output = {"message": result}
+
+    else:
+        raise HTTPException(status_code=404, detail=f"command {uinput} not found")
+    
     
     return output
     

@@ -37,6 +37,9 @@ export default function TerminalPage() {
       description: 'Exit the terminal and return to homepage.',
       usage: 'exit',
       fn: () => router.push('/'),
+    },
+    clear: {
+
     }
   };
 
@@ -99,7 +102,7 @@ export default function TerminalPage() {
 
   return (
     <TerminalWindow>
-      <div ref={scrollRef} className="flex flex-col h-[550px] w-full bg-black text-bone font-mono text-base px-8 pt-4 overflow-y-auto">
+      <div ref={scrollRef} className="flex flex-col h-[550px] w-full bg-black text-bone text-base px-8 pt-4 overflow-y-auto">
         <div className="flex flex-col justify-end flex-grow min-h-0">
           <div className="flex flex-col justify-end flex-grow">
             {history.map((line, i) => (

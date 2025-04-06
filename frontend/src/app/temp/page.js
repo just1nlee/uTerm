@@ -8,9 +8,9 @@ export default function TempPage() {
   const router = useRouter();
 
   const options = [
-    { label: 'Precise', value: '0.1', description: 'Factual, grounded, realistic' },
-    { label: 'Balanced', value: '0.5', description: 'Logical, curious, exploratory' },
-    { label: 'Chaotic', value: '0.9', description: 'Paradoxes, multiverses, impossibilities'}
+    { label: 'Precise', value: '0.1', description: ' -- Factual, grounded, realistic' },
+    { label: 'Balanced', value: '0.5', description: ' -- Logical, curious, exploratory' },
+    { label: 'Chaotic', value: '0.9', description: ' -- Paradoxes, multiverses, impossibilities'}
   ];
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -52,35 +52,26 @@ export default function TempPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  
-
   return (
     <TerminalWindow>
-    <div className="h-[500px] bg-black text-bone font-mono text-xs flex flex-col items-center justify-center px-4">
-      <h1 className="text-2xl mb-6">Select your creativity temperature:</h1>
-
-      <div className="flex flex-col gap-2 text-lg font-mono">
-        {options.map((opt, i) => (
-          <div key={i} className="text-bone">
-            <span className="inline-block w-[1.5ch]">
-              {i === selectedIndex ? '>' : '\u00A0'}
-            </span>
-            <span className={i === selectedIndex ? 'animate-blink' : ''}>
-              {opt.label}
-            </span>
-          </div>
-        ))}
+      <div className="h-[500px] text-bone flex flex-col items-start justify-start pt-10 px-10">
+        <h1 className="mb-2 text-center w-full">Select your creativity temperature:</h1>
+  
+        <div className="flex flex-col gap-2">
+          {options.map((opt, i) => (
+            <div key={i} className="text-bone flex items-center min-h-[1.5rem]">
+              <span className="inline-block w-[1.5ch]">{i === selectedIndex ? '>' : '\u00A0'}</span>
+              <span className={`ml-8 ${i === selectedIndex ? 'animate-blink' : ''}`}>{opt.label}</span>
+              <span className="ml-4">{i === selectedIndex ? opt.description : '\u00A0'}</span>
+            </div>
+          ))}
+        </div>
+  
+        <div className="absolute bottom-20 left-0 w-full text-center text-bone">
+          ↑ ↓ to navigate<br />
+          press [ ENTER ] to explore
+        </div>
       </div>
-
-      <div className="mt-4 text-sm text-bone h-6">
-        {options[selectedIndex].description}
-      </div>
-
-      <div className="mt-6 text-sm text-bone text-center">
-        Use ↑ ↓ to navigate<br />
-        Press [ ENTER ] to explore
-      </div>
-    </div>
     </TerminalWindow>
   );
 }

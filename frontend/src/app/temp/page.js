@@ -25,7 +25,9 @@ export default function TempPage() {
       try {
         const res = await fetch('https://backend-4na6.onrender.com/create/', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json',
+                      'X-API-Key': '18ca0b78f576cf69741d7fac47570aad',
+           },
           body: JSON.stringify({ temperature: selected.value }),
         });
   

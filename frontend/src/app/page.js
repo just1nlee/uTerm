@@ -9,11 +9,15 @@ export default function TerminalScreen() {
   const router = useRouter();
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Enter') {
-        router.push('/temp');
-      }
-    };
+    fetch('https://backend-4na6.onrender.com/', { method: 'GET'}).catch((err) =>
+      console.warn('Wake-up request failed', err)
+  );
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      router.push('/temp');
+    }
+  };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);

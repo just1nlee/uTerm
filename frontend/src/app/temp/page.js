@@ -42,14 +42,6 @@ export default function TempPage() {
         } else {
           console.error('Could not extract universe ID from response');
         }
-  
-        if (universeID) {
-          sessionStorage.setItem('universeID', universeID);
-          sessionStorage.setItem('uterm-temperature', selected.value);
-          router.push('/bootup');
-        } else {
-          console.error('Could not extract universe ID from response');
-        }
       } catch (err) {
         console.error('Failed to create universe:', err);
       }
@@ -88,7 +80,7 @@ export default function TempPage() {
         </div>
         
         <div className="absolute bottom-20 left-0 w-full text-center text-bone">
-          <span className="font-press text-sm">↑ ↓</span> to navigate<br />press [ ENTER ] to explore</div>
+          <span className="font-press text-sm">↑ ↓</span> to navigate<br />press [ ENTER ] to explore █▓▒░</div>
         </div>
     </TerminalWindow>
   );

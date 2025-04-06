@@ -1,8 +1,10 @@
 'use client';
 
-import React, {useState, useRef, useEffect} from 'react'
+const universeID = 100;
+
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import TerminalWindow from '../components/TerminalWindow'
+import TerminalWindow from '../components/TerminalWindow';
 
 export default function TerminalPage() {
   const router = useRouter();
@@ -11,61 +13,106 @@ export default function TerminalPage() {
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
 
-  const commands = {
+  const builtInCommands = {
     echo: {
       description: 'Echo a passed string.',
       usage: 'echo <string>',
       fn: (...args) => args.join(' ')
     },
+    help: {
+      description: 'List commands,',
+      usage: 'help',
+      fn: () => Object.keys(builtInCommands).join(', '),
+    },
     exit: {
       description: 'Exit the terminal and return to homepage.',
       usage: 'exit',
-      fn: () => {
-        router.push('/');
-      }
+      fn: () => router.push('/'),
     }
   };
 
-  function handleCommands(e){
-    e.preventDefault()
+  async function handleCommands(e) {
+    e.preventDefault();
+    const trimmedInput = input.trim();
+    const [cmd, ...args] = trimmedInput.split(' ');
 
-    const [cmd, ...args] = input.trim().split(' ')
-    const output = commands[cmd] ? commands[cmd](...args) : `Command not found: ${cmd}`
+    let output = '';
+    
+    if (builtInCommands[cmd]) {
+      try {
+        output = await builtInCommands[cmd].fn(...args);
+      } catch (err) {
+        output = `Error executing command "${cmd}": ${err.message}`;
+      }
+  
+      setHistory([...history, `* ${input}`, output]);
+      setInput('');
+      return;
+    }
 
-    setHistory([...history, `* ${input}`, output])
-    setInput('')
+    try {
+      const res = await fetch('https://backend-4na6.onrender.com/command/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          universeid: universeID,
+          command: trimmedInput,
+        }),
+      });
+
+      if(!res.ok){
+        const errorData = await res.json();
+        output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
+      } else {
+        const data = await res.json();
+        output = data.message || JSON.stringify(data);
+      }
+    } catch (err) {
+      output = `Client error: ${err.message}`;
+    }
+
+    setHistory([...history, `* ${input}`, output]);
+    setInput('');
   }
 
   useEffect(() => {
-    if(scrollRef.current){
-      scrollRef.current.scrollTo({
-        top: scrollRef.current.scrollHeight,
-        behavior: 'smooth',
+    if (scrollRef.current) {
+      requestAnimationFrame(() => {
+        scrollRef.current.scrollTo({
+          top: scrollRef.current.scrollHeight,
+          behavior: 'smooth',
+        });
       });
     }
   }, [history]);
 
   return (
     <TerminalWindow>
-      <div ref={scrollRef} className="flex flex-col h-[550px] bg-black text-white-400 items-start overflow-y-auto scrollbar-hide">
-          <div className="flex-1">
-            <div className="flex flex-col justify-end h-full">
-              {history.map((line, i) => (
-                <div key={i}>{line}</div>
-              ))}
-            </div>
+      <div
+        ref={scrollRef}
+        className="flex flex-col h-[550px] bg-black text-bone font-mono text-base items-start overflow-y-auto px-4 pt-4"
+      >
+        <div className="flex-1 w-full">
+          <div className="flex flex-col justify-end h-full w-full">
+            {history.map((line, i) => (
+              <div key={i} className="text-base text-bone">
+                {line}
+              </div>
+            ))}
+          </div>
         </div>
-        <form onSubmit={handleCommands} className="flex text-white-400 font-mono text-sm py-2">
-          <span className="mr-2">*</span>
-            <input
-              ref={inputRef}
-              className="bg-transparent border-none outline-none flex-1"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              autoFocus
-            />
-          </form>
-        </div>
+
+        <form onSubmit={handleCommands} className="flex w-full items-center py-2">
+          <span className="mr-2 text-white text-base">*</span>
+          <input
+            ref={inputRef}
+            className="bg-transparent border-none outline-none flex-1 text-bone text-base font-mono"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            autoFocus
+          />
+        </form>
+      </div>
     </TerminalWindow>
   );
 }

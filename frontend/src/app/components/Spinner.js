@@ -24,7 +24,7 @@ export default function AsciiSpinner({ message = 'Cold booting', speed = 180}) {
 
   return (
     <div className="flex flex-col items-center justify-center text-center gap-2">
-      <div className="text-2xl font-mono">
+      <div className="text-2xl">
         {spinnerFrames[spinnerIndex]}
       </div>
       <div className="text-sm text-bone opacity-70">

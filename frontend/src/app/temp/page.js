@@ -1,26 +1,26 @@
 'use client';
-
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import TerminalWindow from '../components/TerminalWindow';
+import AsciiSpinner from '../components/Spinner';
 
 export default function TempPage() {
   const router = useRouter();
-
   const options = [
     { label: 'Precise', value: '0.1', description: ' -- Factual, grounded, realistic' },
     { label: 'Balanced', value: '0.5', description: ' -- Logical, curious, exploratory' },
     { label: 'Chaotic', value: '0.9', description: ' -- Paradoxes, multiverses, impossibilities'}
   ];
-
   const [selectedIndex, setSelectedIndex] = useState(0);
-
+  const [isLoading, setIsLoading] = useState(false);
+  
   const handleKeyDown = async (e) => {
     if (e.key === 'ArrowUp') {
       setSelectedIndex((prev) => (prev === 0 ? options.length - 1 : prev - 1));
     } else if (e.key === 'ArrowDown') {
       setSelectedIndex((prev) => (prev === options.length - 1 ? 0 : prev + 1));
     } else if (e.key === 'Enter') {
+      setIsLoading(true); // Set loading to true when Enter is pressed
       const selected = options[selectedIndex];
       try {
         const res = await fetch('https://backend-4na6.onrender.com/create/', {
@@ -32,27 +32,27 @@ export default function TempPage() {
         });
   
         const data = await res.json();
-
         const universeID = data.message;
-
         if (universeID) {
           sessionStorage.setItem('universeID', universeID);
           sessionStorage.setItem('uterm-temperature', selected.value);
           router.push('/bootup');
         } else {
           console.error('Could not extract universe ID from response');
+          setIsLoading(false); // Reset loading state if there's an error
         }
       } catch (err) {
         console.error('Failed to create universe:', err);
+        setIsLoading(false); // Reset loading state if there's an error
       }
     }
   };
-
+  
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
+  }, [selectedIndex]);
+  
   return (
     <TerminalWindow>
       <div className="h-[500px] w-full text-bone flex flex-col justify-start px-8">
@@ -79,9 +79,18 @@ export default function TempPage() {
           ))}
         </div>
         
-        <div className="absolute bottom-20 left-0 w-full text-center text-bone">
-          <span className="font-press text-sm">↑ ↓</span> to navigate<br />press [ ENTER ] to explore</div>
+        <div className="mt-8 w-full text-center">
+          {isLoading && (
+            <AsciiSpinner 
+              speed={180} 
+            />
+          )}
         </div>
+        
+        <div className="absolute bottom-20 left-0 w-full text-center text-bone">
+          <span className="font-press text-sm">↑ ↓</span> to navigate<br />press [ ENTER ] to explore
+        </div>
+      </div>
     </TerminalWindow>
   );
 }

@@ -249,10 +249,11 @@ Type 'exit' to return to the homepage.
   };
 
   // Define the fixed order for commands.
-const commandOrder = ['help', 'clear', 'bigbang', 'ls', 'tree', 'pwd', 'cd', 'cat', 'echo', 'exit'];
+const commandOrder = ['help', 'info', 'clear', 'bigbang', 'ls', 'tree', 'pwd', 'cd', 'cat', 'echo', 'exit'];
 
 const helpInfo = {
   help: { description: 'List commands.', usage: 'help' },
+  info: { description: 'Display information about current directory.', usage: 'info' }, 
   clear: { description: 'Clear terminal history.', usage: 'clear' },
   bigbang: { description: 'Reset the universe.', usage: 'bigbang' },
   ls: { description: 'List files and directories.', usage: 'ls [options] [path]' },

@@ -104,28 +104,25 @@ Type 'exit' to return to the homepage.
   
       try {
         const res = await fetch(
-          `https://backend-4na6.onrender.com/tab/?universeid=${universeID}&command=${encodeURIComponent(trimmedInput)}`,
+          `/api/tabproxy?universeid=${universeID}&command=${encodeURIComponent(trimmedInput)}`,
           {
             method: 'GET',
-            headers: {
-              'X-API-Key': '18ca0b78f576cf69741d7fac47570aad'
-            },
           }
         );
-  
+      
         if (!res.ok) {
           const errorData = await res.json();
           output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
           setHistory((prev) => [...prev, `* ${input}`, output]);
           return;
-        } else{
+        } else {
           data = await res.json();
         }
       } catch (err) {
         output = `Client error: ${err.message}`;
         setHistory((prev) => [...prev, `* ${input}`, output]);
         return;
-      }
+      } 
   
       const suggestions = data.message;
   
@@ -177,17 +174,16 @@ Type 'exit' to return to the homepage.
     }
   
     try {
-      const res = await fetch('https://backend-4na6.onrender.com/command/', {
+      const res = await fetch('/api/proxy', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': '18ca0b78f576cf69741d7fac47570aad',
         },
         body: JSON.stringify({
           universeid: universeID,
           command: trimmedInput,
         }),
-      });
+      }); 
   
       if (!res.ok) {
         const errorData = await res.json();

@@ -15,6 +15,9 @@ export default function TempPage() {
   const [isLoading, setIsLoading] = useState(false);
   
   const handleKeyDown = async (e) => {
+    // Stop user input if loading
+    if (isLoading) return;
+
     if (e.key === 'ArrowUp') {
       setSelectedIndex((prev) => (prev === 0 ? options.length - 1 : prev - 1));
     } else if (e.key === 'ArrowDown') {
@@ -23,11 +26,11 @@ export default function TempPage() {
       setIsLoading(true); // Set loading to true when Enter is pressed
       const selected = options[selectedIndex];
       try {
-        const res = await fetch('https://backend-4na6.onrender.com/create/', {
+        const res = await fetch('/api/create', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json',
-                      'X-API-Key': '18ca0b78f576cf69741d7fac47570aad',
-           },
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({ temperature: selected.value }),
         });
   

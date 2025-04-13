@@ -52,9 +52,45 @@ export default function TempPage() {
   };
   
   useEffect(() => {
+    const handleKeyDown = async (e) => {
+      if (isLoading) return;
+  
+      if (e.key === 'ArrowUp') {
+        setSelectedIndex((prev) => (prev === 0 ? options.length - 1 : prev - 1));
+      } else if (e.key === 'ArrowDown') {
+        setSelectedIndex((prev) => (prev === options.length - 1 ? 0 : prev + 1));
+      } else if (e.key === 'Enter') {
+        setIsLoading(true);
+        const selected = options[selectedIndex];
+        try {
+          const res = await fetch('/api/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ temperature: selected.value }),
+          });
+  
+          const data = await res.json();
+          const universeID = data.message;
+          if (universeID) {
+            sessionStorage.setItem('universeID', universeID);
+            sessionStorage.setItem('uterm-temperature', selected.value);
+            router.push('/bootup');
+          } else {
+            console.error('Could not extract universe ID from response');
+            setIsLoading(false);
+          }
+        } catch (err) {
+          console.error('Failed to create universe:', err);
+          setIsLoading(false);
+        }
+      }
+    };
+  
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedIndex]);
+  }, [isLoading, selectedIndex]);
   
   return (
     <TerminalWindow>

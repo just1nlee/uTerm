@@ -165,50 +165,46 @@ Type 'exit' to return to the homepage.
 
   async function handleCommands(e) {
     e.preventDefault();
-
     if (isLockedRef.current) return;
     const trimmedInput = input.trim();
     if (!trimmedInput) return;
-    setIsLocked(true);
-    
-    const [cmd, ...args] = trimmedInput.split(' ');
-
-    if (cmd === 'clear') {
-      setHistory([]);
-      setInput('');
-      return;
-    }
-    
-    let output = '';
-    
-    if (builtInCommands[cmd]) {
-      try {
-        output = await builtInCommands[cmd].fn(...args);
-        if (output === '') {
-          setHistory((prev) => [`* ${input}`, ...prev]);
-          setInput('');
-          return;
-        }
-      } catch (err) {
-        output = `Error executing command "${cmd}": ${err.message}`;
-      }
   
-      setHistory((prev) => [output, `* ${input}`, ...prev]);
-      setInput('');
-      return;
-    }
+    setIsLocked(true);
+    let output = '';
   
     try {
+      const [cmd, ...args] = trimmedInput.split(' ');
+  
+      if (cmd === 'clear') {
+        setHistory([]);
+        setInput('');
+        return;
+      }
+  
+      if (builtInCommands[cmd]) {
+        try {
+          output = await builtInCommands[cmd].fn(...args);
+          if (output === '') {
+            setHistory((prev) => [`* ${input}`, ...prev]);
+            setInput('');
+          } else {
+            setHistory((prev) => [output, `* ${input}`, ...prev]);
+            setInput('');
+          }
+        } catch (err) {
+          output = `Error executing command "${cmd}": ${err.message}`;
+          setHistory((prev) => [output, `* ${input}`, ...prev]);
+          setInput('');
+        }
+        return; // ✅ This return is okay because it's inside try and still hits finally
+      }
+  
+      // External command
       const res = await fetch('/api/proxy', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          universeid: universeID,
-          command: trimmedInput,
-        }),
-      }); 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ universeid: universeID, command: trimmedInput }),
+      });
   
       if (!res.ok) {
         const errorData = await res.json();
@@ -217,7 +213,6 @@ Type 'exit' to return to the homepage.
         const data = await res.json();
         if (cmd === 'tree') {
           const parsedTree = JSON.parse(data.message);
-          console.log('TREE RESPONSE:', parsedTree);
           const treeLines = formatTree(parsedTree);
           setHistory((prev) => [...treeLines.reverse(), `* ${input}`, ...prev]);
           setInput('');
@@ -227,15 +222,16 @@ Type 'exit' to return to the homepage.
           output = data.message || JSON.stringify(data);
         }
       }
+  
+      setHistory((prev) => [output, `* ${input}`, ...prev]);
+      setInput('');
+      setAutoScroll(true);
     } catch (err) {
-      output = `Client error: ${err.message}`;
+      setHistory((prev) => [`Error: ${err.message}`, `* ${input}`, ...prev]);
+      setInput('');
     } finally {
       setIsLocked(false);
     }
-  
-    setHistory((prev) => [output, `* ${input}`, ...prev]);
-    setInput('');
-    setAutoScroll(true);
   }
 
   // Focus input on mount and when terminal is clicked

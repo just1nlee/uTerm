@@ -15,6 +15,12 @@ export default function TerminalPage() {
   const [welcomeTyped, setWelcomeTyped] = useState(false);
   const [cursorBlink, setCursorBlink] = useState(true);
   const [cursorPosition, setCursorPosition] = useState(0);
+  const [isLocked, setIsLocked] = useState(false);
+  const isLockedRef = useRef(false);
+
+  useEffect(() => {
+    isLockedRef.current = isLocked;
+  }, [isLocked]);
 
   // Welcome message text
   const welcomeMessage = `
@@ -95,6 +101,8 @@ Type 'exit' to return to the homepage.
     // Always update cursor position on key events
     setCursorPosition(e.target.selectionStart);
 
+    if (isLockedRef.current) return;
+
     if (e.key === 'Tab') {
       e.preventDefault();
       const trimmedInput = input.trim();
@@ -141,9 +149,11 @@ Type 'exit' to return to the homepage.
 
   async function handleCommands(e) {
     e.preventDefault();
+
+    if (isLockedRef.current) return;
     const trimmedInput = input.trim();
-    
     if (!trimmedInput) return;
+    setIsLocked(true);
     
     const [cmd, ...args] = trimmedInput.split(' ');
 
@@ -194,6 +204,8 @@ Type 'exit' to return to the homepage.
       }
     } catch (err) {
       output = `Client error: ${err.message}`;
+    } finally {
+      setIsLocked(false);
     }
   
     setHistory((prev) => [output, `* ${input}`, ...prev]);
@@ -308,6 +320,7 @@ let builtInCommands = {
                     className="opacity-0 absolute top-0 left-0 w-full h-full bg-transparent border-none outline-none text-xl"
                     value={input}
                     onChange={(e) => {
+                      if (isLockedRef.current) return;
                       setInput(e.target.value);
                       setCursorPosition(e.target.selectionStart);
                     }}
@@ -315,8 +328,15 @@ let builtInCommands = {
                       handleKeyDown(e);
                       setCursorPosition(e.target.selectionStart);
                     }}
-                    onSelect={(e) => setCursorPosition(e.target.selectionStart)}
-                    onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                    onClick={(e) => {
+                      if (isLockedRef.current) return;
+                      setCursorPosition(e.target.selectionStart);
+                    }}
+                    
+                    onSelect={(e) => {
+                      if (isLockedRef.current) return;
+                      setCursorPosition(e.target.selectionStart);
+                    }}
                     autoFocus
                   />
                 </div>

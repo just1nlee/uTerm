@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import TerminalWindow from '../components/TerminalWindow';
 import AsciiSpinner from '../components/Spinner';
@@ -13,6 +13,7 @@ export default function TempPage() {
   ];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const isLockedRef = useRef(false);
   
   const handleKeyDown = async (e) => {
     // Stop user input if loading
@@ -50,10 +51,14 @@ export default function TempPage() {
       }
     }
   };
-  
+
+  useEffect(() => {
+    isLockedRef.current = isLoading;
+  }, [isLoading]);
+
   useEffect(() => {
     const handleKeyDown = async (e) => {
-      if (isLoading) return;
+      if (isLockedRef.current) return;
   
       if (e.key === 'ArrowUp') {
         setSelectedIndex((prev) => (prev === 0 ? options.length - 1 : prev - 1));
@@ -90,7 +95,7 @@ export default function TempPage() {
   
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isLoading, selectedIndex]);
+  }, [selectedIndex]);
   
   return (
     <TerminalWindow>

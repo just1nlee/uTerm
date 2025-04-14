@@ -21,14 +21,9 @@ class File:
 
     def to_dict(self):
         if self.type == "dir" and self.content:
-            return {
-                "name": self.name,
-                "contents": [child.to_dict() for child in self.content]
-            }
+            return {"name": self.name, "contents": [child.to_dict() for child in self.content]}
         else:
-            return {
-                "name": self.name
-            }
+            return {"name": self.name}
 
 
 class Directory(File):
@@ -55,8 +50,8 @@ class Text(File):
         super().__init__("txt", name, parent)
         self.content: str = ""
 
-    def generateContent(self, temperature: float):
-        txt = generateText(self.name, temperature)
+    def generateContent(self, pwd:str, temperature: float):
+        txt = generateText(self.name, pwd, temperature)
         if txt == None:
             return 1
         
@@ -118,28 +113,31 @@ class Universe:
         for file in self.currentnode.content:
             if file.type == "txt" and file.name == filename:
                 if not file.content:
-                    if file.generateContent(self.temperature):
+                    if file.generateContent(self.pwd, self.temperature):
                         return "GEMINI_ERROR"
                 return file.content
         return ""
     
             
     def tab(self, input: str):
+        print("start")
         results = []
         
         if " " not in input:
             for command in ["cd ", "cat "]:
                 if command.startswith(input):
                     results.append(command)
+            print("0",input, results)
             return results
 
         input_parts = input.split(" ")
         cmd = input_parts[0]
         if len(input_parts) == 1:
             arg = ""
-        if len(input_parts) == 2:
+        elif len(input_parts) == 2:
             arg = input_parts[1]
         else:
+            print("1",input, results)
             return []
 
         if cmd == "cd":
@@ -151,10 +149,13 @@ class Universe:
                 if file.type == "txt" and file.name.startswith(arg):
                     results.append(file.name)
         else:
+            print("2",input)
             return []
 
         if len(results) == 1:
+            print("3",input)
             return [f"{cmd} {results[0]}"]
+        print("4",input)
         return results
 
 

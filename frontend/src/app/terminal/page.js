@@ -15,12 +15,7 @@ export default function TerminalPage() {
   const [welcomeTyped, setWelcomeTyped] = useState(false);
   const [cursorBlink, setCursorBlink] = useState(true);
   const [cursorPosition, setCursorPosition] = useState(0);
-  const [isLocked, setIsLocked] = useState(false);
-  const isLockedRef = useRef(false);
-
-  useEffect(() => {
-    isLockedRef.current = isLocked;
-  }, [isLocked]);
+  const [treeOutput, setTreeOutput] = useState(null);
 
   // Welcome message text
   const welcomeMessage = `
@@ -97,16 +92,31 @@ Type 'exit' to return to the homepage.
     }
   };
 
+  function formatTree(node, prefix = '', isLast = true) {
+    const lines = [];
+    if (!node || typeof node !== 'object' || !node.name) return lines;
+  
+    const hasChildren = Array.isArray(node.contents) && node.contents.length > 0;
+    const connector = prefix + (prefix ? (isLast ? '└── ' : '├── ') : '');
+    lines.push(connector + node.name);
+  
+    if (hasChildren) {
+      const newPrefix = prefix + (isLast ? '    ' : '│   ');
+      node.contents.forEach((child, i) => {
+        const isLastChild = i === node.contents.length - 1;
+        lines.push(...formatTree(child, newPrefix, isLastChild));
+      });
+    }
+  
+    return lines;
+  }
+
   async function handleKeyDown(e) {
-    // Always update cursor position on key events
     setCursorPosition(e.target.selectionStart);
-
-    if (isLockedRef.current) return;
-
     if (e.key === 'Tab') {
       e.preventDefault();
       const trimmedInput = input.trim();
-  
+
       let data;
       let output;
   
@@ -121,7 +131,7 @@ Type 'exit' to return to the homepage.
         if (!res.ok) {
           const errorData = await res.json();
           output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
-          setHistory((prev) => [...prev, `* ${input}`, output]);
+          setHistory((prev) => [...prev, output, `* ${input}`]);
           return;
         } else {
           data = await res.json();
@@ -138,7 +148,7 @@ Type 'exit' to return to the homepage.
         if (suggestions.length === 1) {
           setInput(suggestions[0]);
         } else if (suggestions.length > 1) {
-          setHistory((prev) => [`* ${input}`, suggestions.join('  '), ...prev]);
+          setHistory((prev) => [suggestions.join('  '), `* ${input}`, ...prev]);
         } else {
           setHistory((prev) => [`* ${input}`, 'No suggestions', ...prev]);
         }
@@ -157,9 +167,8 @@ Type 'exit' to return to the homepage.
     
     const [cmd, ...args] = trimmedInput.split(' ');
 
-    // Special logic for clear command
     if (cmd === 'clear') {
-      setHistory([]); // Clear everything.
+      setHistory([]);
       setInput('');
       return;
     }
@@ -200,7 +209,17 @@ Type 'exit' to return to the homepage.
         output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
       } else {
         const data = await res.json();
-        output = data.message || JSON.stringify(data);
+        if (cmd === 'tree') {
+          const parsedTree = JSON.parse(data.message);
+          console.log('TREE RESPONSE:', parsedTree);
+          const treeLines = formatTree(parsedTree);
+          setHistory((prev) => [...treeLines.reverse(), `* ${input}`, ...prev]);
+          setInput('');
+          setAutoScroll(true);
+          return;
+        } else {
+          output = data.message || JSON.stringify(data);
+        }
       }
     } catch (err) {
       output = `Client error: ${err.message}`;
@@ -232,7 +251,6 @@ Type 'exit' to return to the homepage.
   // Define the fixed order for commands.
 const commandOrder = ['help', 'info', 'clear', 'bigbang', 'ls', 'tree', 'pwd', 'cd', 'cat', 'echo', 'exit'];
 
-// Define a helpInfo object that contains every command's description and usage.
 const helpInfo = {
   help: { description: 'List commands.', usage: 'help' },
   info: { description: 'Display information about current directory.', usage: 'info' }, 
@@ -295,7 +313,7 @@ let builtInCommands = {
           {history.map((line, i) => (
             <div 
               key={i} 
-              className="w-full text-left text-xl text-bone whitespace-pre-wrap mb-1"
+              className="w-full text-left text-xl text-bone whitespace-pre-wrap mb-1 leading-none"
             >
               {line}
             </div>

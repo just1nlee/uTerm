@@ -85,7 +85,9 @@ def tabRequest(request: Request, universeid: int = Query(...), command:str = Que
     universe = universes.getUniverse(universeid)
     if not universe:
         return {"error": "universe not found"}
-    return {"message": universe.tab(command)}
+    results = universe.tab(command)
+    print(results)
+    return {"message": results}
 
 @app.post("/command/")
 @limiter.limit("5/second")

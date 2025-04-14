@@ -16,6 +16,12 @@ export default function TerminalPage() {
   const [cursorBlink, setCursorBlink] = useState(true);
   const [cursorPosition, setCursorPosition] = useState(0);
   const [treeOutput, setTreeOutput] = useState(null);
+  const [isLocked, setIsLocked] = useState(false);
+  const isLockedRef = useRef(false);
+
+  useEffect(() => {
+    isLockedRef.current = isLocked;
+  }, [isLocked]);
 
   // Welcome message text
   const welcomeMessage = `

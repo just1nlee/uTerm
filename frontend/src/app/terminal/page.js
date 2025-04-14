@@ -122,28 +122,25 @@ Type 'exit' to return to the homepage.
   
       try {
         const res = await fetch(
-          `https://backend-4na6.onrender.com/tab/?universeid=${universeID}&command=${encodeURIComponent(trimmedInput)}`,
+          `/api/tabproxy?universeid=${universeID}&command=${encodeURIComponent(trimmedInput)}`,
           {
             method: 'GET',
-            headers: {
-              'X-API-Key': '18ca0b78f576cf69741d7fac47570aad'
-            },
           }
         );
-  
+      
         if (!res.ok) {
           const errorData = await res.json();
           output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
           setHistory((prev) => [...prev, output, `* ${input}`]);
           return;
-        } else{
+        } else {
           data = await res.json();
         }
       } catch (err) {
         output = `Client error: ${err.message}`;
         setHistory((prev) => [...prev, `* ${input}`, output]);
         return;
-      }
+      } 
   
       const suggestions = data.message;
   
@@ -162,9 +159,11 @@ Type 'exit' to return to the homepage.
 
   async function handleCommands(e) {
     e.preventDefault();
+
+    if (isLockedRef.current) return;
     const trimmedInput = input.trim();
-    
     if (!trimmedInput) return;
+    setIsLocked(true);
     
     const [cmd, ...args] = trimmedInput.split(' ');
 
@@ -194,17 +193,16 @@ Type 'exit' to return to the homepage.
     }
   
     try {
-      const res = await fetch('https://backend-4na6.onrender.com/command/', {
+      const res = await fetch('/api/proxy', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': '18ca0b78f576cf69741d7fac47570aad',
         },
         body: JSON.stringify({
           universeid: universeID,
           command: trimmedInput,
         }),
-      });
+      }); 
   
       if (!res.ok) {
         const errorData = await res.json();
@@ -225,6 +223,8 @@ Type 'exit' to return to the homepage.
       }
     } catch (err) {
       output = `Client error: ${err.message}`;
+    } finally {
+      setIsLocked(false);
     }
   
     setHistory((prev) => [output, `* ${input}`, ...prev]);
@@ -338,6 +338,7 @@ let builtInCommands = {
                     className="opacity-0 absolute top-0 left-0 w-full h-full bg-transparent border-none outline-none text-xl"
                     value={input}
                     onChange={(e) => {
+                      if (isLockedRef.current) return;
                       setInput(e.target.value);
                       setCursorPosition(e.target.selectionStart);
                     }}
@@ -345,8 +346,15 @@ let builtInCommands = {
                       handleKeyDown(e);
                       setCursorPosition(e.target.selectionStart);
                     }}
-                    onSelect={(e) => setCursorPosition(e.target.selectionStart)}
-                    onClick={(e) => setCursorPosition(e.target.selectionStart)}
+                    onClick={(e) => {
+                      if (isLockedRef.current) return;
+                      setCursorPosition(e.target.selectionStart);
+                    }}
+                    
+                    onSelect={(e) => {
+                      if (isLockedRef.current) return;
+                      setCursorPosition(e.target.selectionStart);
+                    }}
                     autoFocus
                   />
                 </div>

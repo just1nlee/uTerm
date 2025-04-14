@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import TerminalWindow from '../components/TerminalWindow';
 import AsciiSpinner from '../components/Spinner';
@@ -13,8 +13,12 @@ export default function TempPage() {
   ];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const isLockedRef = useRef(false);
   
   const handleKeyDown = async (e) => {
+    // Stop user input if loading
+    if (isLoading) return;
+
     if (e.key === 'ArrowUp') {
       setSelectedIndex((prev) => (prev === 0 ? options.length - 1 : prev - 1));
     } else if (e.key === 'ArrowDown') {
@@ -23,11 +27,11 @@ export default function TempPage() {
       setIsLoading(true); // Set loading to true when Enter is pressed
       const selected = options[selectedIndex];
       try {
-        const res = await fetch('https://backend-4na6.onrender.com/create/', {
+        const res = await fetch('/api/create', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json',
-                      'X-API-Key': '18ca0b78f576cf69741d7fac47570aad',
-           },
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({ temperature: selected.value }),
         });
   
@@ -47,8 +51,48 @@ export default function TempPage() {
       }
     }
   };
-  
+
   useEffect(() => {
+    isLockedRef.current = isLoading;
+  }, [isLoading]);
+
+  useEffect(() => {
+    const handleKeyDown = async (e) => {
+      if (isLockedRef.current) return;
+  
+      if (e.key === 'ArrowUp') {
+        setSelectedIndex((prev) => (prev === 0 ? options.length - 1 : prev - 1));
+      } else if (e.key === 'ArrowDown') {
+        setSelectedIndex((prev) => (prev === options.length - 1 ? 0 : prev + 1));
+      } else if (e.key === 'Enter') {
+        setIsLoading(true);
+        const selected = options[selectedIndex];
+        try {
+          const res = await fetch('/api/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ temperature: selected.value }),
+          });
+  
+          const data = await res.json();
+          const universeID = data.message;
+          if (universeID) {
+            sessionStorage.setItem('universeID', universeID);
+            sessionStorage.setItem('uterm-temperature', selected.value);
+            router.push('/bootup');
+          } else {
+            console.error('Could not extract universe ID from response');
+            setIsLoading(false);
+          }
+        } catch (err) {
+          console.error('Failed to create universe:', err);
+          setIsLoading(false);
+        }
+      }
+    };
+  
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedIndex]);

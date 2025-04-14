@@ -169,7 +169,7 @@ Type 'exit' to return to the homepage.
     const trimmedInput = input.trim();
     if (!trimmedInput) return;
   
-    setIsLocked(true); // lock input
+    setIsLocked(true);
     let output = '';
   
     try {
@@ -187,27 +187,23 @@ Type 'exit' to return to the homepage.
           if (output === '') {
             setHistory((prev) => [`* ${input}`, ...prev]);
             setInput('');
-            return;
+          } else {
+            setHistory((prev) => [output, `* ${input}`, ...prev]);
+            setInput('');
           }
         } catch (err) {
           output = `Error executing command "${cmd}": ${err.message}`;
+          setHistory((prev) => [output, `* ${input}`, ...prev]);
+          setInput('');
         }
-  
-        setHistory((prev) => [output, `* ${input}`, ...prev]);
-        setInput('');
-        return;
+        return; // ✅ This return is okay because it's inside try and still hits finally
       }
   
       // External command
       const res = await fetch('/api/proxy', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          universeid: universeID,
-          command: trimmedInput,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ universeid: universeID, command: trimmedInput }),
       });
   
       if (!res.ok) {
@@ -234,7 +230,6 @@ Type 'exit' to return to the homepage.
       setHistory((prev) => [`Error: ${err.message}`, `* ${input}`, ...prev]);
       setInput('');
     } finally {
-      // Unlock input after command execution
       setIsLocked(false);
     }
   }

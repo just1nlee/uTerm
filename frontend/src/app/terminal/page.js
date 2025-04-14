@@ -212,13 +212,23 @@ Type 'exit' to return to the homepage.
       } else {
         const data = await res.json();
         if (cmd === 'tree') {
-          const parsedTree = JSON.parse(data.message);
-          const treeLines = formatTree(parsedTree);
-          setHistory((prev) => [...treeLines.reverse(), `* ${input}`, ...prev]);
-          setInput('');
-          setAutoScroll(true);
+          try {
+            output = data.message; // this is the plain text tree
+            setHistory((prev) => [output, `* ${input}`, ...prev]);
+          } catch (err) {
+            setHistory((prev) => [
+              `Error parsing tree response: ${err.message}`,
+              `Response was: ${data.message}`,
+              `* ${input}`,
+              ...prev,
+            ]);
+          } finally {
+            setInput('');
+            setAutoScroll(true);
+          }
           return;
-        } else {
+        }
+        else {
           output = data.message || JSON.stringify(data);
         }
       }

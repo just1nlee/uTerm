@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import TerminalWindow from '../components/TerminalWindow';
 import AsciiSpinner from '../components/Spinner';
@@ -15,16 +15,15 @@ export default function TempPage() {
   const [isLoading, setIsLoading] = useState(false);
   const isLockedRef = useRef(false);
   
-  const handleKeyDown = async (e) => {
-    // Stop user input if loading
-    if (isLoading) return;
-
+  const handleKeyDown = useCallback(async (e) => {
+    if (isLockedRef.current) return;
+  
     if (e.key === 'ArrowUp') {
       setSelectedIndex((prev) => (prev === 0 ? options.length - 1 : prev - 1));
     } else if (e.key === 'ArrowDown') {
       setSelectedIndex((prev) => (prev === options.length - 1 ? 0 : prev + 1));
     } else if (e.key === 'Enter') {
-      setIsLoading(true); // Set loading to true when Enter is pressed
+      setIsLoading(true);
       const selected = options[selectedIndex];
       try {
         const res = await fetch('/api/create', {
@@ -43,59 +42,23 @@ export default function TempPage() {
           router.push('/bootup');
         } else {
           console.error('Could not extract universe ID from response');
-          setIsLoading(false); // Reset loading state if there's an error
+          setIsLoading(false);
         }
       } catch (err) {
         console.error('Failed to create universe:', err);
-        setIsLoading(false); // Reset loading state if there's an error
+        setIsLoading(false);
       }
     }
-  };
+  }, [options, selectedIndex, router]);
+  
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   useEffect(() => {
     isLockedRef.current = isLoading;
   }, [isLoading]);
-
-  useEffect(() => {
-    const handleKeyDown = async (e) => {
-      if (isLockedRef.current) return;
-  
-      if (e.key === 'ArrowUp') {
-        setSelectedIndex((prev) => (prev === 0 ? options.length - 1 : prev - 1));
-      } else if (e.key === 'ArrowDown') {
-        setSelectedIndex((prev) => (prev === options.length - 1 ? 0 : prev + 1));
-      } else if (e.key === 'Enter') {
-        setIsLoading(true);
-        const selected = options[selectedIndex];
-        try {
-          const res = await fetch('/api/create', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ temperature: selected.value }),
-          });
-  
-          const data = await res.json();
-          const universeID = data.message;
-          if (universeID) {
-            sessionStorage.setItem('universeID', universeID);
-            sessionStorage.setItem('uterm-temperature', selected.value);
-            router.push('/bootup');
-          } else {
-            console.error('Could not extract universe ID from response');
-            setIsLoading(false);
-          }
-        } catch (err) {
-          console.error('Failed to create universe:', err);
-          setIsLoading(false);
-        }
-      }
-    };
-  
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedIndex]);
   
   return (
     <TerminalWindow>

@@ -1,3 +1,7 @@
+# Author: Tobias Kohn
+# Description: This file defines the data structure of the universe, along with the functions used to interact with it.
+
+
 from __future__ import annotations
 import os
 from google import genai
@@ -13,6 +17,7 @@ load_dotenv()
 MAX_UNIVERSES = int(os.getenv("MAX_UNIVERSES"))
 
 
+# Base class representing a textfile or directory
 class File:
     def __init__(self, type: Literal['txt','dir'], name: str, parent: Optional[Directory] = None):
         self.type = type
@@ -26,11 +31,13 @@ class File:
             return {"name": self.name}
 
 
+# Class for a directory node in the universe
 class Directory(File):
     def __init__(self, name: str, parent: Optional[Directory] = None):
         super().__init__("dir", name, parent)
         self.content: List[File] = []
 
+    # Calls the Gemini API to generate its contents
     def generateContent(self, temperature: float, wd: str, json: str):
         names = generateDirs(self.name, wd, json, temperature)
         if not names:
@@ -45,11 +52,13 @@ class Directory(File):
         self.content = dirs
 
 
+# Class for a textfile node in the universe
 class Text(File):
     def __init__(self, name: str, parent: Optional[Directory] = None):
         super().__init__("txt", name, parent)
         self.content: str = ""
 
+    # Calls the Gemini API to generate its text
     def generateContent(self, pwd:str, temperature: float):
         txt = generateText(self.name, pwd, temperature)
         if txt == None:
@@ -59,6 +68,7 @@ class Text(File):
         return 0
 
 
+# Class to keep track of a user's entire universe, including functionalities to interact with the universe
 class Universe:
     def __init__(self, universeid: int, universenode: Directory, temperature: float):
         self.universeid: int = universeid
@@ -74,9 +84,11 @@ class Universe:
     def pwd(self):
         return self.wd
     
+    # Calls the Gemini API to generate information about the current directory
     def info(self):
         return generateInfo(self.currentnode.name, self.temperature)
     
+    # Returns the universe in a json format
     def tree(self):
         return json.dumps(self.universenode.to_dict())
 
@@ -90,6 +102,7 @@ class Universe:
 
         return output
     
+    # Changes into a directory, and generates content for the directory if empty
     def cd(self, directory: str):
         if directory == "..":
             if self.currentnode == self.universenode:
@@ -117,17 +130,15 @@ class Universe:
                         return "GEMINI_ERROR"
                 return file.content
         return ""
-    
-            
+     
+    # Autocompletes user input, or returns matches if more than one. 
     def tab(self, input: str):
-        print("start")
         results = []
         
         if " " not in input:
             for command in ["cd ", "cat "]:
                 if command.startswith(input):
                     results.append(command)
-            print("0",input, results)
             return results
 
         input_parts = input.split(" ")
@@ -137,7 +148,6 @@ class Universe:
         elif len(input_parts) == 2:
             arg = input_parts[1]
         else:
-            print("1",input, results)
             return []
 
         if cmd == "cd":
@@ -149,16 +159,14 @@ class Universe:
                 if file.type == "txt" and file.name.startswith(arg):
                     results.append(file.name)
         else:
-            print("2",input)
             return []
 
         if len(results) == 1:
-            print("3",input)
             return [f"{cmd} {results[0]}"]
-        print("4",input)
         return results
 
 
+# Class to manage all universes, allowing to create or delete a universe
 class Universes:
     def __init__(self):
         self.universes: dict[int, Universe] = {}

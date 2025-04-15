@@ -1,3 +1,7 @@
+# Author: Tobias Kohn
+# Description: This file contains the interaction between UTerm's backend and the Gemini API. 
+
+
 import os
 from google import genai
 from fastapi import FastAPI, Request
@@ -10,10 +14,11 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL")
 client = genai.Client(api_key=GEMINI_API_KEY)
 
+# Dynamic prompts depending on temperature selected by user
 def generatePrompt(arg: str, json:str, wd: str, temperature: int):
     output = ""
 
-    if temperature == 0.1:
+    if temperature <= 0.2:
         output = f"""
         You are a virtual system explorer (terminal) navigating a hierarchical file system that represents the universe. Each directory corresponds to a physical object, place, or concept (thing). You are currently exploring the directory: "{arg}".
         Generate only the contents that logically and physically belong inside this directory, but maintain a very minimal scope. Generate children that are direct prodecessors to the parent. Follow these strict rules to maintain structural and conceptual integrity:
@@ -53,7 +58,7 @@ def generatePrompt(arg: str, json:str, wd: str, temperature: int):
         The content you generate should be strictly factual. Very rarely, you can generate hidden (dot) files including secret lore, you can be somewhat creative with this. However, everything should be very specific, narrow scoped, and defined. Do not generalize anything.        
         ensure you adhere to the strict output format
         """
-    elif temperature == 0.5:
+    elif 0.2 < temperature < 0.8:
         output = f"""
         You are a virtual system explorer (terminal) navigating a hierarchical file system that represents the universe. Each directory corresponds to a physical object, place, or concept (thing). You are currently exploring the directory: "{arg}".
         Generate only the contents that logically and physically belong inside this directory, but maintain a very minimal scope. Generate children that are direct prodecessors to the parent. Follow these strict rules to maintain structural and conceptual integrity:
@@ -94,7 +99,7 @@ def generatePrompt(arg: str, json:str, wd: str, temperature: int):
         
         ensure you adhere to the strict output format. 
         """
-    elif temperature == 0.9:
+    elif temperature >= 0.8:
         output = f"""
         You are a virtual system explorer (terminal) navigating a hierarchical file system that represents the universe. Each directory corresponds to a physical object, place, or concept (thing). You are currently exploring the directory: "{arg}".
         Generate only the contents that logically and physically belong inside this directory, but maintain a very minimal scope. Generate children that are direct prodecessors to the parent. Follow these strict rules to maintain structural and conceptual integrity:
@@ -135,28 +140,26 @@ def generatePrompt(arg: str, json:str, wd: str, temperature: int):
         """
     return output
 
-def format_to_snake_case_csv(input_str: str) -> str:
-    words = input_str.strip().split(',')
-    result = []
-
-    for word in words:
-        word = word.strip()
-        snake = re.sub(r'[^a-zA-Z0-9]+', '_', word).lower()
-        snake = re.sub(r'_+', '_', snake).strip('_')
-        if snake:
-            result.append(snake)
-
-    return ','.join(result)
-
-
+# Generate directory names
 def generateDirs(arg: str, wd:str, json:str, temperature: int):
     arg = arg.strip()
+    prompt = generatePrompt(arg, json, wd, temperature)
+    pattern = re.compile(r"^([a-z0-9_]+\.(txt|config)|[a-z0-9_]+)(,([a-z0-9_]+\.(txt|config)|[a-z0-9_]+))*$", re.IGNORECASE)
+    tries = 0.0
 
-    try:
-        response = client.models.generate_content(model=GEMINI_MODEL, contents=generatePrompt(arg, json, wd, temperature), config={"temperature": temperature, "top_k": 10})
-        return [name.strip() for name in response.text.strip().split(',')]
-    except Exception as e:
-        return None
+    
+    while tries < 5:
+        try:
+            response = client.models.generate_content(model=GEMINI_MODEL, contents=prompt, config={"temperature": temperature, "top_k": 10})
+            response = response.text.strip()
+
+            if pattern.match(response):
+                return response.split(",")
+            tries += 1
+            print(f"Gemini returned a bad format. Try {tries} / 5")
+        except Exception as e:
+            return None
+    return None
 
 # Generate content for text file
 def generateText(arg: str, cwd: str,temperature: int):
@@ -169,7 +172,7 @@ def generateText(arg: str, cwd: str,temperature: int):
     except Exception as e:
         return None
     
-# Generate information about 
+# Generate information about current directory
 def generateInfo(arg: str, temperature: int):
     arg = arg.strip()
     input = f"I have created a universe-themed terminal, where we start with the universe and we use AI to generate name of directories to traverse through. Generate output for the function info(), which generates information about the specific directory that you're in. Generate information about {arg}. Your output NEEDS to be only the contents of the file and nothing else. Don't start the response with anything, don't end the response with anything"

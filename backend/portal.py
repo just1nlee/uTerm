@@ -61,6 +61,7 @@ async def verify_origin(request: Request):
 # Verify API key
 def verify_api_key(x_api_key: str = Header(...)):
     if x_api_key != os.getenv("BACKEND_API_KEY"):
+        print(f"[BLOCKED] Invalid API key: {x_api_key}")
         raise HTTPException(status_code=403, detail="Invalid API key")
 
 

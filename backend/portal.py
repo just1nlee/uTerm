@@ -20,7 +20,7 @@ import asyncio
 
 load_dotenv()
 MAX_RPS = os.getenv("MAX_RPS")
-ALLOWED_ORIGINS = {"https://www.universeterminal.com", "https://www.universeterminal.com/temp", "https://www.universeterminal.com/terminal"}
+ALLOWED_ORIGINS = ["https://www.universeterminal.com", "https://www.universeterminal.com/temp", "https://www.universeterminal.com/terminal"]
 
 # Cleanup tool to delete inactive universes after 5 minutes
 @asynccontextmanager
@@ -44,7 +44,7 @@ app = FastAPI(lifespan=lifespan)
 # Browser level protection to verify origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://www.universeterminal.com"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"])

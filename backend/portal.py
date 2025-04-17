@@ -1,3 +1,8 @@
+# Author: Tobias Kohn
+# Decription: This file serves as the backend API for UTerm.
+# It exposes endpoints for creating and deleting a universe, and for executing a command and autocompleting with tab.
+
+
 from pydantic import BaseModel
 from fastapi import FastAPI, Request, HTTPException, Query, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,6 +18,11 @@ from datetime import datetime, timedelta
 from contextlib import asynccontextmanager
 import asyncio
 
+load_dotenv()
+MAX_RPS = os.getenv("MAX_RPS")
+ALLOWED_ORIGINS = ["https://www.universeterminal.com", "https://www.universeterminal.com/temp", "https://www.universeterminal.com/terminal"]
+
+# Cleanup tool to delete inactive universes after 5 minutes
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async def cleanup_loop():
@@ -25,73 +35,80 @@ async def lifespan(app: FastAPI):
                     print(f"[CLEANUP] Universe {uid} deleted due to inactivity")
 
     task = asyncio.create_task(cleanup_loop())
-
-    yield  # app starts here
-
+    yield
     task.cancel()
     
 app = FastAPI(lifespan=lifespan)
+
+
+# Browser level protection to verify origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://www.universeterminal.com", "http://localhost:3000"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"])
 
 
-load_dotenv()
-
+# Verify API key
 def verify_api_key(x_api_key: str = Header(...)):
-    if x_api_key != os.getenv("FRONTEND_KEY"):
+    if x_api_key != os.getenv("BACKEND_API_KEY"):
+        print(f"[BLOCKED] Invalid API key: {x_api_key}")
         raise HTTPException(status_code=403, detail="Invalid API key")
 
+
+# Rate limiter setup
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
-
 app.add_middleware(SlowAPIMiddleware)
-
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request, exc):
     return JSONResponse(status_code=429, content={"detail": "Too many requests"})
 
 
-universes = Universes()
-
+# Pydantic models for input
 class Create(BaseModel):
     temperature: float
-
 class Command(BaseModel):
     universeid: int
     command: str
 
 
+# Initializes universes manager
+universes = Universes()
+
+
+# Endpoint for root
 @app.get("/")
 def rootRequest():
     return {"message": "UTerm is online"}
 
 
+# Endpoint for creating a universe
 @app.post("/create/")
-@limiter.limit("5/second")
-def createRequest(request: Request, body: Create, _: None = Depends(verify_api_key)):
+@limiter.limit(MAX_RPS)
+async def createRequest(request: Request, body: Create, _: None = Depends(verify_api_key)):
     temperature = body.temperature
     universeid = universes.createUniverse(temperature)
     universes.getUniverse(universeid)._touch()
     return {"message": f"{universeid}"}
 
 
+# Endpoint for tab suggestion/autocomplete
 @app.get("/tab/")
-@limiter.limit("5/second")
-def tabRequest(request: Request, universeid: int = Query(...), command:str = Query(...), _: None = Depends(verify_api_key)):
+@limiter.limit(MAX_RPS)
+async def tabRequest(request: Request, universeid: int = Query(...), command:str = Query(...), _: None = Depends(verify_api_key)):
     universe = universes.getUniverse(universeid)
     if not universe:
         return {"error": "universe not found"}
     results = universe.tab(command)
-    print(results)
     return {"message": results}
 
+
+# Endpoint for processing command
 @app.post("/command/")
-@limiter.limit("5/second")
-def commandRequest(request: Request, body: Command, _: None = Depends(verify_api_key)):
+@limiter.limit(MAX_RPS)
+async def commandRequest(request: Request, body: Command, _: None = Depends(verify_api_key)):
     universeid = body.universeid
     uinput = body.command
     universe = universes.getUniverse(universeid)
@@ -144,8 +161,9 @@ def commandRequest(request: Request, body: Command, _: None = Depends(verify_api
     return output
     
 
+# Endpoint for deleting universe
 @app.delete("/{universeid}")
-@limiter.limit("5/second")
-def deleteRequest(request: Request, universeid: int, _: None = Depends(verify_api_key)):
+@limiter.limit(MAX_RPS)
+async def deleteRequest(request: Request, universeid: int, _: None = Depends(verify_api_key)):
     universes.deleteUniverse(universeid)
     return {"message": f"deleted {universeid}"}

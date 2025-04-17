@@ -144,7 +144,7 @@ def generatePrompt(arg: str, json:str, wd: str, temperature: int):
 def generateDirs(arg: str, wd:str, json:str, temperature: int):
     arg = arg.strip()
     prompt = generatePrompt(arg, json, wd, temperature)
-    pattern = re.compile(r"^([a-z0-9_]+\.(txt|config)|[a-z0-9_]+)(,([a-z0-9_]+\.(txt|config)|[a-z0-9_]+))*$", re.IGNORECASE)
+    pattern = re.compile(r"^(\.?[a-z0-9_]+(\.(txt|config))?)(,\.?[a-z0-9_]+(\.(txt|config))?)*$", re.IGNORECASE)
     tries = 0.0
 
     

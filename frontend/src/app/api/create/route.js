@@ -1,5 +1,8 @@
 // app/api/create/route.js
 
+// Author: Justin Lee
+// Description: API route for creating a new universe
+
 export async function POST(req) {
     const { temperature } = await req.json();
   

@@ -1,5 +1,8 @@
 // app/api/tabproxy/route.js
 
+// Author: Justin Lee
+// Description: API route for proxying tab command requests to the backend
+
 export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const universeid = searchParams.get('universeid');

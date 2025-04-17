@@ -1,4 +1,8 @@
-// /src/app/bootup/page.js
+// Author: Justin Lee
+// Description: 
+//  Bootup screen for universe terminal. Displays a Linux Plymouth inspired animation before routing to 
+//  terminal screen.
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -8,6 +12,7 @@ export default function BootupPage() {
   const router = useRouter();
   const [lines, setLines] = useState([]);
 
+  // Custom bootup messages
   const bootMessages = useMemo(() => [
     '[  OK  ] Establishing system uplink...',
     '[  OK  ] Launching uTerm Shell...',
@@ -36,7 +41,9 @@ export default function BootupPage() {
     '[  OK  ] uTerm v1.0 is now online...',
   ], []);
 
+  // Custom boot animation
   useEffect(() => {
+    // Tracks current index of boot message
     let i = 0;
   
     const interval = setInterval(() => {
@@ -45,24 +52,32 @@ export default function BootupPage() {
         i++;
       }
   
+      // If all messages have been displayed, clear interval and route to terminal page
       if (i === bootMessages.length) {
         clearInterval(interval);
+        // Wait for a bit before routing to terminal
         setTimeout(() => {
           router.push('/terminal');
         }, 850);
       }
+    // Interval to display each boot message
     }, 25);
   
     return () => clearInterval(interval);
+  // This updates the function and optimizes memory.
   }, [router, bootMessages]); 
 
   return (
     <div className="h-screen bg-black text-bone text-xl p-6">
+      {/* Bootup animation */}
       {lines.map((line, idx) => {
+        {/* Checks if line is a string and if it matches [ TAG ] content format */}
         const match = typeof line === 'string' ? line.match(/^\[\s*([A-Z]+)\s*\]\s(.+)$/i) : null;
         const tag = match ? match[1] : '';
         const content = match ? match[2] : line;
 
+        
+        {/* Sets text color based on tag */}
         let tagColor = 'text-white';
         if (tag === 'BOOT') tagColor = 'text-green-400';
         else if (tag === 'OK') tagColor = 'text-green-400';

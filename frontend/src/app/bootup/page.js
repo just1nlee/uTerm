@@ -1,4 +1,6 @@
-// /src/app/bootup/page.js
+// Author:
+// Description: 
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';

@@ -1,4 +1,8 @@
+// Author:
+// Description: 
+
 'use client';
+
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import TerminalWindow from '../components/TerminalWindow';

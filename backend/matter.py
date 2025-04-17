@@ -133,10 +133,11 @@ class Universe:
      
     # Autocompletes user input, or returns matches if more than one. 
     def tab(self, input: str):
+        commands = ["help ", "info ", "clear ", "bigbang ", "ls ", "tree ", "pwd ", "cd ", "cat ", "echo ", "exit "]
         results = []
         
         if " " not in input:
-            for command in ["cd ", "cat "]:
+            for command in commands:
                 if command.startswith(input):
                     results.append(command)
             return results

@@ -13,7 +13,7 @@ import AsciiSpinner from '../components/Spinner';
 export default function TempPage() {
   const router = useRouter();
 
-  // Gemini 2.0 Flash-Lite API temperature options
+  // Custom Gemini 2.0 Flash-Lite API temperature options
   const options = [
     { label: 'Precise', value: '0.1', description: ' -- Factual, grounded, realistic' },
     { label: 'Balanced', value: '0.5', description: ' -- Logical, curious, exploratory' },
@@ -105,8 +105,7 @@ export default function TempPage() {
                 {i === selectedIndex ? '>' : ' '}
               </span>
   
-              {/* Pulses selected option label */}
-              <span className={`w-32 ml-10 ${i === selectedIndex ? 'animate-pulse' : ''}`}>
+              <span className={`w-32 ml-10 ${i === selectedIndex ? 'animate' : ''}`}>
                   {opt.label}
               </span>
   

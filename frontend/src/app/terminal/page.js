@@ -22,6 +22,7 @@ export default function TerminalPage() {
   const [isLocked, setIsLocked] = useState(false);
   const isLockedRef = useRef(false);
 
+  // Ref to lock input after a command has been entered to avoid multiple requests
   useEffect(() => {
     isLockedRef.current = isLocked;
   }, [isLocked]);
@@ -35,6 +36,7 @@ Type 'exit' to return to the homepage.
 
 `;
 
+  // 
   useEffect(() => {
     const storedID = sessionStorage.getItem('universeID');
     if (storedID) {
@@ -94,6 +96,7 @@ Type 'exit' to return to the homepage.
     }
   }, [history]);
 
+  // Handles scrolling event
   const handleScroll = () => {
     if (terminalContentRef.current) {
       const isScrolledToTop = terminalContentRef.current.scrollTop < 10;
@@ -101,6 +104,7 @@ Type 'exit' to return to the homepage.
     }
   };
 
+  // Formats tree command output for display
   function formatTree(node, prefix = '', isLast = true) {
     const lines = [];
     if (!node || typeof node !== 'object' || !node.name) return lines;
@@ -199,7 +203,7 @@ Type 'exit' to return to the homepage.
           setHistory((prev) => [output, `* ${input}`, ...prev]);
           setInput('');
         }
-        return; // ✅ This return is okay because it's inside try and still hits finally
+        return; 
       }
   
       // External command

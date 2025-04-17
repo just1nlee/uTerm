@@ -1,5 +1,8 @@
 // app/api/proxy/route.js
 
+// Author: Justin Lee
+// Description: API route for proxying command requests to the backend
+
 function formatTree(node, prefix = '', isLast = true) {
   const lines = [];
   if (!node || typeof node !== 'object' || !node.name) return lines;
@@ -27,7 +30,7 @@ export async function POST(req) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': process.env.BACKEND_API_KEY, // Use env var
+          'X-API-Key': process.env.BACKEND_API_KEY,
         },
         body: JSON.stringify({
           universeid,

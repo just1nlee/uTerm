@@ -31,6 +31,7 @@ export default function BootupPage() {
     '[  OK  ] Parsing spatial signature index...',
     '[ FAIL ] Extraterreestrial signal not detected...',
     '[  OK  ] Initiating procedural galaxy seeder...',
+    '[  OK  ] Sending appreciation from Oregon State University...',
     '[  OK  ] Initializing Cosmic I/O Drivers...',
     '[  OK  ] Memory sector integrity: 100%',
     '[  OK  ] Ready to initiate starwalk.',

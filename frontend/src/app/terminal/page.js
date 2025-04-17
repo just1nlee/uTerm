@@ -1,5 +1,7 @@
-// Author:
+// Author: Justin Lee
 // Description: 
+//  Terminal page for universe terminal. CLI interface for interacting with 
+//  Gemini 2.0 Flash-Lite API. 
 
 'use client';
 
@@ -34,44 +36,55 @@ export default function TerminalPage() {
 Type 'help' to see available commands.
 Type 'exit' to return to the homepage.
 
-`;
+  `;
 
-  // 
+  // Uses saved universe ID from session storage
   useEffect(() => {
+    // Retreives stored universe ID from session storage
     const storedID = sessionStorage.getItem('universeID');
+    // If found, set it to state
     if (storedID) {
       setUniverseID(parseInt(storedID, 10));
     } else {
       console.warn('No universeID found in sessionStorage');
     }
-    
-    // Type out welcome message only once
+  }, []); // Runs once on mount
+
+  // Welcome message animation
+  useEffect(() => {
     if (!welcomeTyped) {
       let currentText = '';
       const lines = welcomeMessage.split('\n');
       let currentLine = 0;
       let currentChar = 0;
-      
+  
+      // Timer to type out message
       const typeInterval = setInterval(() => {
+        // If there are still lines to type
         if (currentLine < lines.length) {
+          // If there are still characters to type in the current line
           if (currentChar < lines[currentLine].length) {
             currentText += lines[currentLine][currentChar];
             setHistory([currentText]);
             currentChar++;
+          // If the current line is finished, return a new line
           } else {
             currentText += '\n';
             currentLine++;
+            // Reset char index for next line
             currentChar = 0;
           }
+        // If all lines are finished, clear interval
         } else {
           clearInterval(typeInterval);
+          // Set state
           setWelcomeTyped(true);
         }
-      }, 30); // Adjust typing speed here
-      
+      }, 30);   // Adjust typing speed here
+  
       return () => clearInterval(typeInterval);
     }
-  }, [welcomeTyped]);
+  }, [welcomeTyped, welcomeMessage]);
 
   // Blinking cursor effect
   useEffect(() => {
@@ -124,8 +137,11 @@ Type 'exit' to return to the homepage.
     return lines;
   }
 
+  // Handles keydown events for input
   async function handleKeyDown(e) {
+    // Updates cursor position
     setCursorPosition(e.target.selectionStart);
+    // Tab key event
     if (e.key === 'Tab') {
       e.preventDefault();
       const trimmedInput = input.trim();
@@ -134,6 +150,7 @@ Type 'exit' to return to the homepage.
       let output;
   
       try {
+        // Send HTTP GET request to tabproxy API
         const res = await fetch(
           `/api/tabproxy?universeid=${universeID}&command=${encodeURIComponent(trimmedInput)}`,
           {
@@ -141,11 +158,13 @@ Type 'exit' to return to the homepage.
           }
         );
       
+        // If request fails, handle error
         if (!res.ok) {
           const errorData = await res.json();
           output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
           setHistory((prev) => [...prev, output, `* ${input}`]);
           return;
+        // If request succeeds, parses JSON response
         } else {
           data = await res.json();
         }
@@ -157,6 +176,7 @@ Type 'exit' to return to the homepage.
   
       const suggestions = data.message;
   
+      // Prints suggestions to terminal
       if (Array.isArray(suggestions)) {
         if (suggestions.length === 1) {
           setInput(suggestions[0]);
@@ -165,6 +185,7 @@ Type 'exit' to return to the homepage.
         } else {
           setHistory((prev) => [`* ${input}`, 'No suggestions', ...prev]);
         }
+        // Scrolls to bottom of terminal automatically
         setAutoScroll(true);
       }
     }

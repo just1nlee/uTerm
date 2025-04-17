@@ -50,14 +50,6 @@ app.add_middleware(
     allow_headers=["*"])
 
 
-# Verify origin
-async def verify_origin(request: Request):
-    origin = request.headers.get("origin")
-    if origin not in ALLOWED_ORIGINS:
-        print(f"[BLOCKED] Unauthorized origin: {origin}")
-        raise HTTPException(status_code=403, detail="Origin not allowed")
-
-
 # Verify API key
 def verify_api_key(x_api_key: str = Header(...)):
     if x_api_key != os.getenv("BACKEND_API_KEY"):
@@ -95,7 +87,7 @@ def rootRequest():
 # Endpoint for creating a universe
 @app.post("/create/")
 @limiter.limit(MAX_RPS)
-async def createRequest(request: Request, body: Create, _: None = Depends(verify_api_key), __: None = Depends(verify_origin)):
+async def createRequest(request: Request, body: Create, _: None = Depends(verify_api_key)):
     temperature = body.temperature
     universeid = universes.createUniverse(temperature)
     universes.getUniverse(universeid)._touch()
@@ -105,7 +97,7 @@ async def createRequest(request: Request, body: Create, _: None = Depends(verify
 # Endpoint for tab suggestion/autocomplete
 @app.get("/tab/")
 @limiter.limit(MAX_RPS)
-async def tabRequest(request: Request, universeid: int = Query(...), command:str = Query(...), _: None = Depends(verify_api_key), __: None = Depends(verify_origin)):
+async def tabRequest(request: Request, universeid: int = Query(...), command:str = Query(...), _: None = Depends(verify_api_key)):
     universe = universes.getUniverse(universeid)
     if not universe:
         return {"error": "universe not found"}
@@ -116,7 +108,7 @@ async def tabRequest(request: Request, universeid: int = Query(...), command:str
 # Endpoint for processing command
 @app.post("/command/")
 @limiter.limit(MAX_RPS)
-async def commandRequest(request: Request, body: Command, _: None = Depends(verify_api_key), __: None = Depends(verify_origin)):
+async def commandRequest(request: Request, body: Command, _: None = Depends(verify_api_key)):
     universeid = body.universeid
     uinput = body.command
     universe = universes.getUniverse(universeid)
@@ -172,6 +164,6 @@ async def commandRequest(request: Request, body: Command, _: None = Depends(veri
 # Endpoint for deleting universe
 @app.delete("/{universeid}")
 @limiter.limit(MAX_RPS)
-async def deleteRequest(request: Request, universeid: int, _: None = Depends(verify_api_key), __: None = Depends(verify_origin)):
+async def deleteRequest(request: Request, universeid: int, _: None = Depends(verify_api_key)):
     universes.deleteUniverse(universeid)
     return {"message": f"deleted {universeid}"}

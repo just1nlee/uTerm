@@ -19,6 +19,7 @@ export default function BootupPage() {
     '',
     '[ BOOT ] Initializing uTerm v1.0 interface...',
     '[  OK  ] Environment Secure...',
+    '[  OK  ] Secure Boot Enabled...',
     '[  OK  ] Loading Shell Components...',
     '[  OK  ] Connecting to Gemini 2.0 Flash-Lite API...',
     '[  OK  ] Reached target Gemini 2.0 Flash-Lite API...',
@@ -38,6 +39,8 @@ export default function BootupPage() {
     '[  OK  ] Interdimensional API loaded.',
     '[  OK  ] Staging inference sandbox for interactive shell...',
     '[  OK  ] Language model warm-start complete.',
+    '[  OK  ] Signal Acquired: Greetings from Oregon State University...',
+    '[  OK  ] Core systems initialized. Thanks, Mom, for the original bootloader.',
     '[  OK  ] uTerm v1.0 is now online...',
   ], []);
 

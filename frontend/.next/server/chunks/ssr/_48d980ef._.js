@@ -29,6 +29,7 @@ function BootupPage() {
             '',
             '[ BOOT ] Initializing uTerm v1.0 interface...',
             '[  OK  ] Environment Secure...',
+            '[  OK  ] Secure Boot Enabled...',
             '[  OK  ] Loading Shell Components...',
             '[  OK  ] Connecting to Gemini 2.0 Flash-Lite API...',
             '[  OK  ] Reached target Gemini 2.0 Flash-Lite API...',
@@ -48,6 +49,8 @@ function BootupPage() {
             '[  OK  ] Interdimensional API loaded.',
             '[  OK  ] Staging inference sandbox for interactive shell...',
             '[  OK  ] Language model warm-start complete.',
+            '[  OK  ] Signal Acquired: Greetings from Oregon State University...',
+            '[  OK  ] Core systems initialized. Thanks, Mom, for the original bootloader.',
             '[  OK  ] uTerm v1.0 is now online...'
         ], []);
     // Custom boot animation
@@ -102,21 +105,21 @@ function BootupPage() {
                                     children: tag
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/bootup/page.js",
-                                    lineNumber: 92,
+                                    lineNumber: 95,
                                     columnNumber: 19
                                 }, this),
                                 "]"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/bootup/page.js",
-                            lineNumber: 90,
+                            lineNumber: 93,
                             columnNumber: 17
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                             children: content
                         }, void 0, false, {
                             fileName: "[project]/src/app/bootup/page.js",
-                            lineNumber: 95,
+                            lineNumber: 98,
                             columnNumber: 17
                         }, this)
                     ]
@@ -124,18 +127,18 @@ function BootupPage() {
                     children: line
                 }, void 0, false, {
                     fileName: "[project]/src/app/bootup/page.js",
-                    lineNumber: 98,
+                    lineNumber: 101,
                     columnNumber: 15
                 }, this)
             }, `${line}-${idx}`, false, {
                 fileName: "[project]/src/app/bootup/page.js",
-                lineNumber: 87,
+                lineNumber: 90,
                 columnNumber: 11
             }, this);
         })
     }, void 0, false, {
         fileName: "[project]/src/app/bootup/page.js",
-        lineNumber: 71,
+        lineNumber: 74,
         columnNumber: 5
     }, this);
 }

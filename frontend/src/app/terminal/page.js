@@ -34,9 +34,7 @@ export default function TerminalPage() {
 ░▒▓█ welcome to uTerm, a terminal-based universe explorer
 
 Type 'help' to see available commands.
-Type 'exit' to return to the homepage.
-
-  `;
+Type 'exit' to return to the homepage.`;
 
   // Uses saved universe ID from session storage
   useEffect(() => {

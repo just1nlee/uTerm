@@ -94,9 +94,7 @@ function TerminalPage() {
 ░▒▓█ welcome to uTerm, a terminal-based universe explorer
 
 Type 'help' to see available commands.
-Type 'exit' to return to the homepage.
-
-  `;
+Type 'exit' to return to the homepage.`;
     // Uses saved universe ID from session storage
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "TerminalPage.useEffect": ()=>{
@@ -118,22 +116,29 @@ Type 'exit' to return to the homepage.
                 const lines = welcomeMessage.split('\n');
                 let currentLine = 0;
                 let currentChar = 0;
+                // Timer to type out message
                 const typeInterval = setInterval({
                     "TerminalPage.useEffect.typeInterval": ()=>{
+                        // If there are still lines to type
                         if (currentLine < lines.length) {
+                            // If there are still characters to type in the current line
                             if (currentChar < lines[currentLine].length) {
                                 currentText += lines[currentLine][currentChar];
                                 setHistory([
                                     currentText
                                 ]);
                                 currentChar++;
+                            // If the current line is finished, return a new line
                             } else {
                                 currentText += '\n';
                                 currentLine++;
+                                // Reset char index for next line
                                 currentChar = 0;
                             }
+                        // If all lines are finished, clear interval
                         } else {
                             clearInterval(typeInterval);
+                            // Set state
                             setWelcomeTyped(true);
                         }
                     }
@@ -205,17 +210,22 @@ Type 'exit' to return to the homepage.
         }
         return lines;
     }
+    // Handles keydown events for input
     async function handleKeyDown(e) {
+        // Updates cursor position
         setCursorPosition(e.target.selectionStart);
+        // Tab key event
         if (e.key === 'Tab') {
             e.preventDefault();
             const trimmedInput = input.trim();
             let data;
             let output;
             try {
+                // Send HTTP GET request to tabproxy API
                 const res = await fetch(`/api/tabproxy?universeid=${universeID}&command=${encodeURIComponent(trimmedInput)}`, {
                     method: 'GET'
                 });
+                // If request fails, handle error
                 if (!res.ok) {
                     const errorData = await res.json();
                     output = `Error ${res.status}: ${errorData.detail || 'unknown error'}`;
@@ -225,6 +235,7 @@ Type 'exit' to return to the homepage.
                             `* ${input}`
                         ]);
                     return;
+                // If request succeeds, parses JSON response
                 } else {
                     data = await res.json();
                 }
@@ -238,6 +249,7 @@ Type 'exit' to return to the homepage.
                 return;
             }
             const suggestions = data.message;
+            // Prints suggestions to terminal
             if (Array.isArray(suggestions)) {
                 if (suggestions.length === 1) {
                     setInput(suggestions[0]);
@@ -254,6 +266,7 @@ Type 'exit' to return to the homepage.
                             ...prev
                         ]);
                 }
+                // Scrolls to bottom of terminal automatically
                 setAutoScroll(true);
             }
         }
@@ -479,12 +492,12 @@ Type 'exit' to return to the homepage.
                             children: line
                         }, i, false, {
                             fileName: "[project]/src/app/terminal/page.js",
-                            lineNumber: 339,
+                            lineNumber: 352,
                             columnNumber: 13
                         }, this))
                 }, void 0, false, {
                     fileName: "[project]/src/app/terminal/page.js",
-                    lineNumber: 333,
+                    lineNumber: 346,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -498,7 +511,7 @@ Type 'exit' to return to the homepage.
                                 children: "*"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/terminal/page.js",
-                                lineNumber: 351,
+                                lineNumber: 364,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -513,14 +526,14 @@ Type 'exit' to return to the homepage.
                                                 children: input.substring(0, cursorPosition)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/terminal/page.js",
-                                                lineNumber: 356,
+                                                lineNumber: 369,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: `h-5 w-2 bg-bone inline-block align-middle ${cursorBlink ? 'opacity-100' : 'opacity-0'}`
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/terminal/page.js",
-                                                lineNumber: 357,
+                                                lineNumber: 370,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -528,7 +541,7 @@ Type 'exit' to return to the homepage.
                                                 children: input.substring(cursorPosition)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/terminal/page.js",
-                                                lineNumber: 360,
+                                                lineNumber: 373,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -555,34 +568,34 @@ Type 'exit' to return to the homepage.
                                                 autoFocus: true
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/terminal/page.js",
-                                                lineNumber: 361,
+                                                lineNumber: 374,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/terminal/page.js",
-                                        lineNumber: 355,
+                                        lineNumber: 368,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/terminal/page.js",
-                                    lineNumber: 354,
+                                    lineNumber: 367,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/terminal/page.js",
-                                lineNumber: 353,
+                                lineNumber: 366,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/terminal/page.js",
-                        lineNumber: 350,
+                        lineNumber: 363,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/terminal/page.js",
-                    lineNumber: 349,
+                    lineNumber: 362,
                     columnNumber: 9
                 }, this),
                 !autoScroll && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -591,18 +604,18 @@ Type 'exit' to return to the homepage.
                     children: "↑ Scroll to newest"
                 }, void 0, false, {
                     fileName: "[project]/src/app/terminal/page.js",
-                    lineNumber: 392,
+                    lineNumber: 405,
                     columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/terminal/page.js",
-            lineNumber: 328,
+            lineNumber: 341,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/app/terminal/page.js",
-        lineNumber: 327,
+        lineNumber: 340,
         columnNumber: 5
     }, this);
 }

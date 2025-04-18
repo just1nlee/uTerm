@@ -41,7 +41,6 @@ function BootupPage() {
             '[  OK  ] Parsing spatial signature index...',
             '[ FAIL ] Extraterreestrial signal not detected...',
             '[  OK  ] Initiating procedural galaxy seeder...',
-            '[  OK  ] Sending appreciation from Oregon State University...',
             '[  OK  ] Initializing Cosmic I/O Drivers...',
             '[  OK  ] Memory sector integrity: 100%',
             '[  OK  ] Ready to initiate starwalk.',
@@ -103,21 +102,21 @@ function BootupPage() {
                                     children: tag
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/bootup/page.js",
-                                    lineNumber: 93,
+                                    lineNumber: 92,
                                     columnNumber: 19
                                 }, this),
                                 "]"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/bootup/page.js",
-                            lineNumber: 91,
+                            lineNumber: 90,
                             columnNumber: 17
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                             children: content
                         }, void 0, false, {
                             fileName: "[project]/src/app/bootup/page.js",
-                            lineNumber: 96,
+                            lineNumber: 95,
                             columnNumber: 17
                         }, this)
                     ]
@@ -125,18 +124,18 @@ function BootupPage() {
                     children: line
                 }, void 0, false, {
                     fileName: "[project]/src/app/bootup/page.js",
-                    lineNumber: 99,
+                    lineNumber: 98,
                     columnNumber: 15
                 }, this)
             }, `${line}-${idx}`, false, {
                 fileName: "[project]/src/app/bootup/page.js",
-                lineNumber: 88,
+                lineNumber: 87,
                 columnNumber: 11
             }, this);
         })
     }, void 0, false, {
         fileName: "[project]/src/app/bootup/page.js",
-        lineNumber: 72,
+        lineNumber: 71,
         columnNumber: 5
     }, this);
 }

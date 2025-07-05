@@ -1,6 +1,8 @@
 # Universe Terminal (uTerm)
 The **universe terminal**, or **uTerm**, is a terminal-based universe explorer that lets you navigate galaxies, explore cosmic directories and discover new knowledge, all from a custom command-line interface. 
 
+**Check our project demo here:** [universe terminal (uTerm) demo](https://www.youtube.com/watch?v=36T455y57i8)
+
 **Try it now:** [universeterminal.com](https://www.universeterminal.com/)
 > ⚠️ **Notice:** On the creativity temperature select screen, the site may appear unresponsive after selecting an option. If the "cold booting" message flashes and then disappears, repeat the selection a few times. This issue is due to a known bug with the backend cold start and was never fully patched. Once it wakes up, the terminal will proceed as expected.
 

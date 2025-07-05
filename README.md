@@ -45,6 +45,8 @@ uTerm simulates a UNIX filesystem where each directory is a piece of the univers
 > **Tip:** Use `tree` to visualize the structure of your explored universe.
 
 ## Feedback & Contributions
+Checkout the Devpost to learn more about the project: [devpost - universe terminal](https://devpost.com/software/universe-terminal)
+
 Have a feature request or want to contribute? Open an issue or fork the repo and submit a PR!
 
 

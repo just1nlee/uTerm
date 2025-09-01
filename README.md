@@ -19,7 +19,7 @@ uTerm simulates a UNIX filesystem where each directory is a piece of the univers
 - **Frontend:** React, Next.js, TailwindCSS
 - **Backend:** FastAPI, Uvicorn, CORS, SlowAPI
 - **AI:** Google's Gemini 2.0 Flash-Lite
-- **Deployment:** Vercel
+- **Deployment:** Vercel (frontend), Render (backend)
 
 ## Supported Commands
 | Command     | Description                                |

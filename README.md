@@ -1,10 +1,9 @@
-# Universe Terminal (uTerm)
-The **universe terminal**, or **uTerm**, is a terminal-based universe explorer that lets you navigate galaxies, explore cosmic directories and discover new knowledge, all from a custom command-line interface. 
-
-**Check our project demo here:** [universe terminal (uTerm) demo](https://www.youtube.com/watch?v=36T455y57i8)
+# Universe Terminal
+The **universe terminal** is a terminal-based universe explorer that lets you navigate galaxies, explore cosmic directories and discover new knowledge, all from a custom command-line interface. 
 
 **Try it now:** [universeterminal.com](https://www.universeterminal.com/)
-> ⚠️ **Notice:** On the creativity temperature select screen, the site may appear unresponsive after selecting an option. If the "cold booting" message flashes and then disappears, repeat the selection a few times. This issue is due to a known bug with the backend cold start and was never fully patched. Once it wakes up, the terminal will proceed as expected.
+
+**Check our project demo here:** [universe terminal demo](https://www.youtube.com/watch?v=36T455y57i8)
 
 ## Features
 - Terminal-style interface inspired by Linux/UNIX systems
@@ -20,7 +19,7 @@ uTerm simulates a UNIX filesystem where each directory is a piece of the univers
 - **Frontend:** React, Next.js, TailwindCSS
 - **Backend:** FastAPI, Uvicorn, CORS, SlowAPI
 - **AI:** Google's Gemini 2.0 Flash-Lite
-- **Deployment:** Vercel (frontend), Render (backend)
+- **Deployment:** Vercel
 
 ## Supported Commands
 | Command     | Description                                |
@@ -46,7 +45,3 @@ uTerm simulates a UNIX filesystem where each directory is a piece of the univers
 
 ## Feedback & Contributions
 Checkout the Devpost to learn more about the project: [devpost - universe terminal](https://devpost.com/software/universe-terminal)
-
-Have a feature request or want to contribute? Open an issue or fork the repo and submit a PR!
-
-
